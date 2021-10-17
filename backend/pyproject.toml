@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["elviktor <marco.flagg@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+environs = {version = "8.0.0", extras = ["django"]}
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pendulum = "^1.4"
+django = "3.1.0"
+psycopg2-binary = "2.8.5"
+django-crispy-forms = "1.9.2"
+django-allauth = "0.42.0"
+django-debug-toolbar = "2.2"
+djangorestframework = "3.11.0"
+django-cors-headers = "3.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
