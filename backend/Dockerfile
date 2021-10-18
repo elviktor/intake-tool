@@ -19,3 +19,6 @@ RUN poetry config virtualenvs.create false \
 
 # Creating folders, and files for a project:
 COPY . /code
+
+# Port to expose
+EXPOSE 8000
