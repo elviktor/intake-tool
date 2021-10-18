@@ -3,7 +3,9 @@ version: '3.8'
 services:
   web:
     image: "elviktor/intake-tool"
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/code
     ports:

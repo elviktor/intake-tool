@@ -3,7 +3,7 @@ FROM python:3.8
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
-ENV PTYONNUNBUFFERED 1
+ENV PYTHONNUMBUFFERED 1
 
 # Install dependencies
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
