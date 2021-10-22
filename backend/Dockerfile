@@ -11,13 +11,21 @@ ENV PATH="${PATH}:/root/.poetry/bin"
 
 # Set work directory
 WORKDIR /code
+
+# Copy project code
 COPY pyproject.toml poetry.lock /code/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
+# Copy entrypoint.sh
+COPY entrypoint.sh /code/
+RUN sed -i 's/\r$//g' /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
+# run entrypoint.sh
+ENTRYPOINT ["/code/entrypoint.sh"]
+
 # Creating folders, and files for a project:
 COPY . /code
-
-EXPOSE 8000
