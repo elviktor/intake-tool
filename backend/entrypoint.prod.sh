@@ -1,14 +1,13 @@
 #!/bin/sh
 
-if [ "$DATABASE" = "postgres" ]
-then
-    echo "Waiting for postgres..."
+#!/bin/sh
 
-    while ! nc -z $SQL_HOST $SQL_PORT; do
-      sleep 0.1
-    done
+set -e
 
-    echo "PostgreSQL started"
-fi
+# activate our virtual environment here
+. /opt/pysetup/.venv/bin/activate
 
+# You can put other setup logic here
+echo "Let's go!"
+# Evaluating passed command:
 exec "$@"

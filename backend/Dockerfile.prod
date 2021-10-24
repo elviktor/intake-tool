@@ -1,5 +1,5 @@
 # Pull base image
-FROM python:3.8 as python-base
+FROM python:3.9.6 as python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -24,6 +24,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         curl \
         build-essential
+RUN apt-get -y install netcat-openbsd
 
 # Install dependencies
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
@@ -77,6 +78,9 @@ RUN poetry install
 # Copy directory into container
 WORKDIR $APP_HOME
 COPY . .
+
+# Install netcat (nc)
+#RUN apt-get install mc
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
