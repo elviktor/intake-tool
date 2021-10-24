@@ -31,7 +31,7 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 ENV PATH="${PATH}:/root/.poetry/bin"
 
 # Set work directory
-WORKDIR /code
+WORKDIR /code 
 
 # We copy our Python requirements here to cache them
 # and install only runtime deps using poetry
