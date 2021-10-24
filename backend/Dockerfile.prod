@@ -59,7 +59,7 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir -p $APP_HOME
 RUN mkdir $APP_HOME/staticfiles
-#WORKDIR $APP_HOME
+RUN mkdir $APP_HOME/mediafiles
 
 # Copying poetry and venv into image
 COPY --from=builder-base $POETRY_HOME $POETRY_HOME
