@@ -8,7 +8,7 @@
 #      sleep 0.1
 #    done
 
-#    echo "PostgreSQL started"
+#    echo "PostgreSQL started" 
 #fi
 
 set -e
