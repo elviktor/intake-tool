@@ -136,3 +136,6 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 # Custom User model
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# HTTPS Setup
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

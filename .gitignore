@@ -111,7 +111,9 @@ env.bak/
 venv.bak/
 *env.dev
 *env.prod
+*env.staging
 *env.prod.db
+*env.staging.db
 
 # Spyder project settings
 .spyderproject
