@@ -115,6 +115,9 @@ venv.bak/
 *env.prod.db
 *env.staging.db
 
+# yml
+*.yml
+
 # Spyder project settings
 .spyderproject
 .spyproject
