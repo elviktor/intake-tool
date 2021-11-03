@@ -140,3 +140,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # HTTPS Setup
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Login Info
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

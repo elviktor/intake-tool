@@ -7,7 +7,14 @@ from upload.views import image_upload
 
 urlpatterns = [
     #path("", image_upload, name="upload"),
+    # Django admin
     path('admin/', admin.site.urls),
+
+    # User management
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    # Local apps
+    path("accounts/", include('accounts.urls')),
     path("", include('pages.urls')),
 ]
 
