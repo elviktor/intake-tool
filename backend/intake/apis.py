@@ -7,7 +7,7 @@ from .serializers import MoveSerializer, SequenceSerializer
 import requests
 import json
 
-@login_required
+#@login_required
 def get_moves(request):
     moves = MoveSerializer(
         Move.objects.all().order_by("title"),
@@ -16,7 +16,7 @@ def get_moves(request):
 
     return JsonResponse({"moves": moves})
 
-@login_required
+#@login_required
 def get_sequences(request):
     sequences = SequenceSerializer(
         Sequence.objects.all(),
