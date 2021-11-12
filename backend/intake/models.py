@@ -91,3 +91,31 @@ class Move(models.Model):
         """String for representing the Model object."""
 
         return f'{self.type}_{self.title.lower().replace(" ", "_")}'
+
+
+class Script(models.Model):
+    """Model representing a client intake ticket."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
+    #m1 = models.ForeignKey(Move, on_delete=models.SET_NULL, null=True)
+    #m2 = models.ForeignKey(Move, on_delete=models.SET_NULL, null=True, blank=True)
+    #rating = models.IntegerField(null=True)
+    #comment = models.TextField(blank=True)
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.title.lower().replace(" ", "_")
+
+class Sequence(models.Model):
+    """Model representing a client intake ticket."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #title = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
+    script = models.ForeignKey(Script, on_delete=models.SET_NULL, null=True)
+    order_num = models.IntegerField(null=True)
+    move = models.ForeignKey(Move, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.script}__{self.order_num}'
