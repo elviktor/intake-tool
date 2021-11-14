@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.utils import timezone
+from accounts.models import CustomUser
 
 class Issue(models.Model):
     """Model representing a client issue."""
@@ -76,7 +78,7 @@ class Move(models.Model):
     )
 
     title = models.CharField(max_length=200)
-    quote = models.CharField(max_length=200)
+    quote = models.CharField(max_length=500)
 
     # Cross referencing fields
     entity = models.ManyToManyField(Entity, blank=True)
@@ -94,21 +96,24 @@ class Move(models.Model):
 
 
 class Script(models.Model):
-    """Model representing a client intake ticket."""
+    """Model representing a script that organizes moves."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    author = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    date = models.DateField(default=timezone.now)
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
-    #m1 = models.ForeignKey(Move, on_delete=models.SET_NULL, null=True)
-    #m2 = models.ForeignKey(Move, on_delete=models.SET_NULL, null=True, blank=True)
-    #rating = models.IntegerField(null=True)
-    #comment = models.TextField(blank=True)
+
+    # Cross referencing fields
+    entity = models.ManyToManyField(Entity, blank=True)
+    issue = models.ManyToManyField(Issue, blank=True)
+    keyword = models.ManyToManyField(Keyword, blank=True)
 
     def __str__(self):
         """String for representing the Model object."""
         return self.title.lower().replace(" ", "_")
 
 class Sequence(models.Model):
-    """Model representing a client intake ticket."""
+    """Model representing a script sequence."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     #title = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
@@ -119,3 +124,27 @@ class Sequence(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.script}__{self.order_num}'
+
+class SequenceRecord(models.Model):
+    """Model that records the sequence that a user follows in intake tool"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    m1 = models.CharField(max_length=200)
+    m2 = models.CharField(max_length=200, blank=True)
+    m3 = models.CharField(max_length=200, blank=True)
+    m4 = models.CharField(max_length=200, blank=True)
+    m5 = models.CharField(max_length=200, blank=True)
+    m6 = models.CharField(max_length=200, blank=True)
+    m7 = models.CharField(max_length=200, blank=True)
+    m8 = models.CharField(max_length=200, blank=True)
+    m9 = models.CharField(max_length=200, blank=True)
+    m10 = models.CharField(max_length=200, blank=True)
+    m11 = models.CharField(max_length=200, blank=True)
+    m12 = models.CharField(max_length=200, blank=True)
+    m13 = models.CharField(max_length=200, blank=True)
+    m14 = models.CharField(max_length=200, blank=True)
+    m15 = models.CharField(max_length=200, blank=True)
+    m16 = models.CharField(max_length=200, blank=True)
+    m17 = models.CharField(max_length=200, blank=True)
+    m18 = models.CharField(max_length=200, blank=True)
+    m19 = models.CharField(max_length=200, blank=True)
+    m20 = models.CharField(max_length=200, blank=True)

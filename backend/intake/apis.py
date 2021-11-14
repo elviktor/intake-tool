@@ -9,8 +9,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
-from .models import Move, Sequence
-from .serializers import MoveSerializer, SequenceSerializer
+from .models import Move, Sequence, SequenceRecord
+from .serializers import MoveSerializer, SequenceSerializer, SequenceRecordSerializer
 
 import requests
 import json
@@ -25,7 +25,7 @@ def get_moves(request):
 
         return JsonResponse({"quote": move_single_quote})
 
-    if request.method == 'GET':
+    elif request.method == 'GET':
         moves = MoveSerializer(
             Move.objects.all().order_by("title"),
             many = True
@@ -41,3 +41,21 @@ def get_sequences(request):
     ).data
 
     return JsonResponse({"sequences": sequences})
+
+@api_view(['GET', 'POST'])
+@csrf_exempt
+def get_sequencerecords(request):
+    if request.method == 'POST':
+        serializer = SequenceRecordSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'GET':
+        records = SequenceRecordSerializer(
+            SequenceRecord.objects.all(),
+            many = True
+        ).data
+
+        return JsonResponse({"records": records})

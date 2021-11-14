@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Move, Sequence
+from .models import Move, Sequence, SequenceRecord
 
 class MoveSerializer(serializers.ModelSerializer):
 
@@ -17,7 +17,10 @@ class SequenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sequence
         fields = ("script", "order_num", "move")
-        # To look up the Move based on this serializer's fields?
-        # 1) for downloaded Move dictionary - reverse the lowercase and spacing
-        #   to perform a JSON key search
-        # 2) for API GET request - search by Move key or name
+
+
+class SequenceRecordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SequenceRecord
+        fields = "__all__"
