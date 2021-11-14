@@ -80,6 +80,19 @@ class Move(models.Model):
     title = models.CharField(max_length=200)
     quote = models.CharField(max_length=500)
 
+    # Emergency choice
+    EMERGENCY = (
+        ('y', 'Yes'),
+        ('n', 'No'),
+        ('u', 'Unknown'),
+    )
+
+    emergency = models.CharField(
+        max_length=1,
+        choices=EMERGENCY,
+        default='n',
+    )
+
     # Cross referencing fields
     entity = models.ManyToManyField(Entity, blank=True)
     issue = models.ManyToManyField(Issue, blank=True)
@@ -87,6 +100,7 @@ class Move(models.Model):
 
     # Additional fields
     link = models.URLField(blank=True)
+    information = models.TextField(blank=True)
 
 
     def __str__(self):
