@@ -6,7 +6,7 @@ class MoveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Move
-        fields = ("type", "title", "quote")
+        fields = "__all__"
 
 
 class SequenceSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class SequenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sequence
-        fields = ("script", "order_num", "move")
+        fields = "__all__"
 
 
 class SequenceRecordSerializer(serializers.ModelSerializer):
