@@ -22,8 +22,11 @@ def get_moves(request):
         move_name = str(request.POST['move_name'])
         move_single = get_object_or_404(Move, title__iexact=move_name)
         move_single_quote = str(move_single.quote)
+        move_single_info = str(move_single.information)
+        move_single_emergency = str(move_single.emergency)
+        move_single_link = str(move_single.link)
 
-        return JsonResponse({"quote": move_single_quote})
+        return JsonResponse({"quote": move_single_quote, "info": move_single_info, "emergency": move_single_emergency, "link": move_single_link})
 
     elif request.method == 'GET':
         moves = MoveSerializer(
