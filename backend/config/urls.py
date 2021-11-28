@@ -14,7 +14,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     # Local apps
-    #path("intake/", include('intake.urls')),
+    path("intakemanager/", include('intakemanager.urls')),
     path("intake/", include('intake.urls')),
     path("accounts/", include('accounts.urls')),
     path("", include('pages.urls')),
