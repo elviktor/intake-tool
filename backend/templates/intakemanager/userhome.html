@@ -1,0 +1,24 @@
+{% extends '_base.html' %}
+{% block title %}User Resources{% endblock title %}
+
+{% block content %}
+  <h1>User Resources</h1>
+  <div class="">
+    {% if user.is_authenticated %}
+      Hi {{ user.email }}!
+      <a href="{% url 'account_logout' %}">Log Out</a>
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'account_login' %}">Log In</a>
+      <a href="{% url 'account_signup' %}">Sign Up</a>
+    {% endif %}
+  </div>
+  <div class="">
+    <h1>All users name </h1>
+    {% for user in users %}
+    {{user.first_name}}
+    {% endfor %}
+  </div>
+
+
+{% endblock content %}

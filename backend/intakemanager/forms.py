@@ -20,12 +20,10 @@ class IntakeUserForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Fieldset(
-
                 'msc_group',
                 'first_name',
                 'last_name',
                 'area'
-
             )
         )
         self.fields['user'].initial = self.request.user
