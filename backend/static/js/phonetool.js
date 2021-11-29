@@ -88,6 +88,7 @@ function response_button(id) {
       Accept: "application/json"
     },
     data: {
+      csrfmiddlewaretoken: csrftoken,
       move_name: future_move
     }
   };
@@ -161,6 +162,7 @@ function issue_button(id) {
       Accept: "application/json"
     },
     data: {
+      csrfmiddlewaretoken: csrftoken,
       move_name: future_move
     }
   };
@@ -289,6 +291,7 @@ function build_issue_buttons() {
           Accept: "application/json"
         },
         data: {
+          csrfmiddlewaretoken: csrftoken,
           move_name: issue_api_title_list[j]
         }
       };
@@ -419,6 +422,7 @@ function emergency_checker(move) {
       Accept: "application/json"
     },
     data: {
+      csrfmiddlewaretoken: csrftoken,
       move_name: move
     }
   };
@@ -568,6 +572,7 @@ function action_button() {
             Accept: "application/json"
           },
           data: {
+            csrfmiddlewaretoken: csrftoken,
             move_name: future_move_api_title
           }
         };
@@ -598,6 +603,7 @@ function action_button() {
                 Accept: "application/json"
               },
               data: {
+                csrfmiddlewaretoken: csrftoken,
                 move_name: future2_move_api_title_list[i]
               }
             };
@@ -629,6 +635,7 @@ function action_button() {
                 Accept: "application/json"
               },
               data: {
+                csrfmiddlewaretoken: csrftoken,
                 move_name: future2_move_api_title_list[i]
               }
             };
@@ -739,6 +746,7 @@ function action_button() {
             Accept: "application/json"
           },
           data: {
+            csrfmiddlewaretoken: csrftoken,
             move_name: future_move_api_title
           }
         };
@@ -804,6 +812,7 @@ function action_button() {
             Accept: "application/json"
           },
           data: {
+            csrfmiddlewaretoken: csrftoken,
             m1: ex_obj.m1,
             m2: ex_obj.m2,
             m3: ex_obj.m3,
@@ -861,6 +870,7 @@ function action_button() {
             Accept: "application/json"
           },
           data: {
+            csrfmiddlewaretoken: csrftoken,
             move_name: future_move_api_title
           }
         };
@@ -905,6 +915,7 @@ function action_button() {
         Accept: "application/json"
       },
       data: {
+        csrfmiddlewaretoken: csrftoken,
         move_name: "Greet"
       }
     };
@@ -936,6 +947,7 @@ function action_button() {
         Accept: "application/json"
       },
       data: {
+        csrfmiddlewaretoken: csrftoken,
         move_name: "Triage"
       }
     };

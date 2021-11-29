@@ -7,7 +7,8 @@ def intakeUserForm(request):
     if form.is_valid():
         u = form.save()
         users = IntakeUser.objects.all()
-        return render(request, 'home.html')
+        return render(request, 'intakemanager/userhome.html')
+        # Change to render(request, 'intakemanager/userhome.html')
 
     else:
         form_class = IntakeUserForm(request=request)
