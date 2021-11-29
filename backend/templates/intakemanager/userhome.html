@@ -14,10 +14,27 @@
     {% endif %}
   </div>
   <div class="">
-    <h1>All users name </h1>
-    {% for user in users %}
-    {{user.first_name}}
-    {% endfor %}
+    <h3>Find intake tool at the following link:</h3>
+    <a href="{% url 'intaketool' %}">
+      Intake Tool
+    </a>
+
+  </div>
+  <div class="">
+    <h3>Find training resources at the following link:</h3>
+    <a target="_blank"
+      href="https://docs.google.com/presentation/d/1KaP5qTH5dRkzZQAL9JkTQVOgNneKz3pN8N91IG6R_zQ/edit?usp=sharing">
+      Training Resources
+    </a>
+
+  </div>
+  <div class="">
+    <h3>Find your schedule below:</h3>
+    <iframe src="{{msc_group.schedule}}"
+      style="border: 0" width="800" height="600"
+      frameborder="0" scrolling="no">
+    </iframe>
+
   </div>
 
 

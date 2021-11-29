@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--
+      This is the page head - it contains info the browser uses to display the page
+      You won't see what's in the head in the page
+      Scroll down to the body element for the page content
+    -->
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://glitch.com/favicon.ico" />
+
+    <!--
+      This is an HTML comment
+      You can write text in a comment and the content won't be visible in the page
+    -->
+
+    <title>Phone Tool</title>
+
+    <!-- Import the webpage's stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <script src="{% static 'json/phonescript.json' %}"></script>
+
+  </head>
+  <body>
+    {% csrf_token %}
+    <div id="text_container">
+      <h2>
+        Script:
+      </h2>
+      <p id="text"></p>
+    </div>
+    <div id="info_container">
+      <p id="info"></p>
+    </div>
+    <div id="link_container">
+      <a id="link"></a>
+    </div>
+
+    <button id="next_button" onclick="action_button()">
+      Next
+    </button>
+    <div id="response_container">
+      <button id="response_0" class="response" onclick="response_button('response_0_info')">
+      </button>
+      <button id="response_1" class="response" onclick="response_button('response_1_info')">
+      </button>
+      <button id="response_2" class="response" onclick="response_button('response_2_info')">
+      </button>
+      <button id="response_3" class="response" onclick="response_button('response_3_info')">
+      </button>
+      <button id="response_4" class="response" onclick="response_button('response_4_info')">
+    </button>
+      <div id="response_info" style="display:none;">
+        <p id="response_0_info"></p>
+        <p id="response_1_info"></p>
+        <p id="response_2_info"></p>
+        <p id="response_3_info"></p>
+        <p id="response_4_info"></p>
+        <p id="future_prefix"></p>
+      </div>
+    </div>
+    <div id="emergency_container">
+      <h4>Emergency:</h4>
+      <p id="emergency_text"></p>
+    </div>
+
+    <div id="issue_menu_container" style="display:none;">
+      <button id="issue_0" class="issue" onclick="issue_button('issue_0_info')">
+      </button>
+      <button id="issue_1" class="issue" onclick="issue_button('issue_1_info')">
+      </button>
+      <button id="issue_2" class="issue" onclick="issue_button('issue_2_info')">
+      </button>
+      <button id="issue_3" class="issue" onclick="issue_button('issue_3_info')">
+      </button>
+      <button id="issue_4" class="issue" onclick="issue_button('issue_4_info')">
+      </button>
+      <button id="issue_5" class="issue" onclick="issue_button('issue_5_info')">
+      </button>
+      <button id="issue_6" class="issue" onclick="issue_button('issue_6_info')">
+      </button>
+      <button id="issue_7" class="issue" onclick="issue_button('issue_7_info')">
+      </button>
+      <button id="issue_8" class="issue" onclick="issue_button('issue_8_info')">
+      </button>
+      <button id="issue_9" class="issue" onclick="issue_button('issue_9_info')">
+      </button>
+      <button id="issue_10" class="issue" onclick="issue_button('issue_9_info')">
+      </button>
+    </div>
+    <div id="issue_info" style="display:none;">
+      <p id="issue_0_info"></p>
+      <p id="issue_1_info"></p>
+      <p id="issue_2_info"></p>
+      <p id="issue_3_info"></p>
+      <p id="issue_4_info"></p>
+      <p id="issue_5_info"></p>
+      <p id="issue_6_info"></p>
+      <p id="issue_7_info"></p>
+      <p id="issue_8_info"></p>
+      <p id="issue_9_info"></p>
+    </div>
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'js/phonetool.js' %}"></script>
+  </body>
+</html>
