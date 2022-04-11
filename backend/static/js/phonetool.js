@@ -13,8 +13,8 @@ var usage_id = 0; // Usage id must be unique for each use. I can use datetime fo
 var test_df = {};
 
 // Load JSON dataframes
-var m_df = JSON.parse(moves);
-var mdict_df = JSON.parse(definitions);
+//var m_df = JSON.parse(moves);
+//var mdict_df = JSON.parse(definitions);
 
 // Moves Dataframe (m_df) index list
 // the list items follow the column names of m_df
