@@ -1,31 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!--
-      This is the page head - it contains info the browser uses to display the page
-      You won't see what's in the head in the page
-      Scroll down to the body element for the page content
-    -->
+{% extends '_base.html' %}
+{% block title %}Intake Tool{% endblock title %}
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="" />
+{% block content %}
 
-    <!--
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-    <title>Justice Seed</title>
-
-    <!-- Import the webpage's stylesheet -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-
-    <script src="{% static 'json/phonescript.json' %}"></script>
-
-  </head>
-  <body>
+<div class="row">
+  <div class="col-md-6">
     {% csrf_token %}
     <div id="text_container">
       <h2>
@@ -104,8 +83,15 @@
       <p id="issue_8_info"></p>
       <p id="issue_9_info"></p>
     </div>
-    <!-- JavaScript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{% static 'js/phonetool.js' %}"></script>
-  </body>
-</html>
+  </div>
+  <div class="col-md-6">
+    <h1>Calendar</h1>
+    <iframe src="https://calendar.google.com/calendar/embed?src=spjc62km27aifl6a04vkbv0lts%40group.calendar.google.com&ctz=America%2FNew_York"
+        style="border: 0" width="100%" height="400px" frameborder="0" scrolling="no">
+    </iframe>
+  </div>
+</div>
+
+
+
+{% endblock content %}
