@@ -1,5 +1,5 @@
 {% extends '_base.html' %}
-{% block title %}Intake Tool{% endblock title %}
+{% block title %}Justice Seed{% endblock title %}
 
 {% block content %}
 
@@ -8,7 +8,7 @@
     {% csrf_token %}
     <div id="text_container">
       <h2>
-        Script:
+        Know Your Rights
       </h2>
       <p id="text"></p>
     </div>
@@ -94,7 +94,6 @@
 {% load static %}
 
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'js/phonetool01.js' %}"></script>
 <script src="{% static 'json/phonescript.json' %}"></script>
 

@@ -5,19 +5,23 @@ FROM python:3.8
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONNUMBUFFERED 1
 
-# Install dependencies
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-ENV PATH="${PATH}:/root/.poetry/bin"
+ENV POETRY_HOME=/opt/poetry
+RUN python3 -m venv $POETRY_HOME && \
+    $POETRY_HOME/bin/pip install poetry==1.2.0
+
+RUN git clone https://github.com/python-poetry/poetry /poetry
 
 # Set work directory
 WORKDIR /code
 
+ENV VIRTUAL_ENV=/poetry-env \
+    PATH="/poetry-env/bin:$POETRY_HOME/bin:$PATH"
+
 # Copy project code
 COPY pyproject.toml poetry.lock /code/
 
-# Project initialization:
-RUN poetry config virtualenvs.create false \
-  && poetry install --no-interaction --no-ansi
+RUN python3 -m venv $VIRTUAL_ENV && \
+    poetry install
 
 # Copy entrypoint.sh
 COPY entrypoint.sh /code/
@@ -27,5 +31,6 @@ RUN chmod +x /code/entrypoint.sh
 # run entrypoint.sh
 ENTRYPOINT ["/code/entrypoint.sh"]
 
+CMD "pytest"
 # Creating folders, and files for a project:
 COPY . /code
