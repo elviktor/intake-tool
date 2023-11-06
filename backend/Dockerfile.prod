@@ -25,21 +25,29 @@ RUN apt-get update \
         curl \
         build-essential
 
-# Install dependencies
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-ENV PATH="${PATH}:/root/.poetry/bin"
+ENV POETRY_HOME=/opt/poetry
+RUN python3 -m venv $POETRY_HOME && \
+    $POETRY_HOME/bin/pip install poetry==1.2.0
+
+RUN git clone https://github.com/python-poetry/poetry /poetry
 
 # Set work directory
 WORKDIR /code
 
+ENV VIRTUAL_ENV=/poetry-env \
+    PATH="/poetry-env/bin:$POETRY_HOME/bin:$PATH"
+
 # We copy our Python requirements here to cache them
 # and install only runtime deps using poetry
-WORKDIR $PYSETUP_PATH
-COPY poetry.lock pyproject.toml ./
+#WORKDIR $PYSETUP_PATH
+
+# Copy project code
+#COPY poetry.lock pyproject.toml ./
+COPY pyproject.toml poetry.lock /code/
 
 # Project initialization:
-RUN poetry config virtualenvs.create false \
-  && poetry install --no-dev
+RUN python3 -m venv $VIRTUAL_ENV && \
+    poetry install
 
 #################
 #  Development  #
