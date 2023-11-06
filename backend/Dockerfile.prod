@@ -39,15 +39,15 @@ ENV VIRTUAL_ENV=/poetry-env \
 
 # We copy our Python requirements here to cache them
 # and install only runtime deps using poetry
-#WORKDIR $PYSETUP_PATH
+WORKDIR $PYSETUP_PATH
 
 # Copy project code
-#COPY poetry.lock pyproject.toml ./
-COPY pyproject.toml poetry.lock /code/
+COPY poetry.lock pyproject.toml ./
+#COPY pyproject.toml poetry.lock /code/
 
 # Project initialization:
-RUN python3 -m venv $VIRTUAL_ENV && \
-    poetry install
+#RUN python3 -m venv $VIRTUAL_ENV && \
+#    poetry install
 
 #################
 #  Development  #
