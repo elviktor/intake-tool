@@ -13,7 +13,11 @@ urlpatterns = [
     # User management
     path('accounts/', include('allauth.urls')),
 
+    # API
+    path('v0/', include('api.urls')),
+
     # Local apps
+    path("tracker/", include('tracker.urls')),
     path("intakemanager/", include('intakemanager.urls')),
     path("intake/", include('intake.urls')),
     path("accounts/", include('accounts.urls')),

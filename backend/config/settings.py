@@ -47,13 +47,16 @@ INSTALLED_APPS = [
     'crispy_forms',
     'allauth',
     'allauth.account',
+    'rest_framework',
 
     # Local
-    'accounts',
-    'upload',
-    'pages',
-    'intake',
-    'intakemanager',
+    'tracker.apps.TrackerConfig',
+    'api.apps.ApiConfig',
+    'accounts.apps.AccountsConfig',
+    'upload.apps.UploadConfig',
+    'pages.apps.PagesConfig',
+    'intake.apps.IntakeConfig',
+    'intakemanager.apps.IntakemanagerConfig',
 
 ]
 
