@@ -9,5 +9,10 @@ set -e
 
 # You can put other setup logic here 
 echo "Let's go!"
+
+# Experiment...
+python manage.py flush --no-input
+python manage.py migrate
+
 # Evaluating passed command:
 exec "$@"
