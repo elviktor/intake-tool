@@ -1,0 +1,10 @@
+<h1>All plants</h1>
+{% for plant in object_list %}
+
+    <ul>
+        <li>Id: {{ plant.id }}</li>
+        <li>Strain: {{ plant.strain }}</li>
+        <li>Birth Date: {{ plant.birth_date }}</li>
+        <li>Location: {{ plant.location }}</li>
+    </ul>
+{% endfor %}

@@ -35,5 +35,9 @@ class Plant(models.Model):
     strain = models.CharField(max_length=250)
     transaction_id = models.IntegerField()
 
+    def get_absolute_url(self):
+        """Returns the url to access a particular author instance."""
+        return reverse('plant_detail', args=[str(self.id)])
+    
     def __str__(self):
         return self.id
