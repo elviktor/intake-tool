@@ -24,7 +24,7 @@ class Plant(models.Model):
     destroy_scheduled_time = models.DateTimeField()
     external_id = models.CharField(max_length=250)
     harvest_scheduled = models.BooleanField()
-    id = models.CharField(max_length=250)
+    biotrack_id = models.CharField(max_length=250)
     location = models.CharField(max_length=250)
     mother = models.BooleanField()
     org_id = models.IntegerField()
