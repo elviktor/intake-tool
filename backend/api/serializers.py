@@ -9,4 +9,4 @@ class BookSerializer(serializers.ModelSerializer):
 class PlantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ('id', 'strain', 'birth_date', 'location')
+        fields = ('biotrack_id')
