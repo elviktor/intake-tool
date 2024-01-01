@@ -16,7 +16,7 @@ class Book(models.Model):
         return self.title
 
 class Plant(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     birth_date = models.DateField(null=True, blank=True)
     converted = models.BooleanField()
     deleted = models.BooleanField()
