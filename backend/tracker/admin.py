@@ -1,5 +1,26 @@
 from django.contrib import admin
-from .models import Book, Plant
+from .models import Book, Plant, Strain, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
 
 admin.site.register(Book)
 admin.site.register(Plant)
+admin.site.register(Strain)
+admin.site.register(Weight)
+admin.site.register(Derivative)
+admin.site.register(Plant_Harvest)
+admin.site.register(Lab_Result)
+admin.site.register(Lab_Sample_Result)
+admin.site.register(Lab_Sample)
+admin.site.register(Inventory)
+admin.site.register(Inventory_Room)
+admin.site.register(Inventory_Sublot)
+admin.site.register(Inventory_Move)
+admin.site.register(Plant_Cure)
+admin.site.register(Invoice_Inventory)
+admin.site.register(Invoice_Model)
+admin.site.register(Manifest_Driver)
+admin.site.register(Stop_Item)
+admin.site.register(Manifest_Stop)
+admin.site.register(Manifest_Vehicle)
+admin.site.register(Manifest_ThirdPartyTransporter)
+admin.site.register(Manifest)
+admin.site.register(Grow_Room)

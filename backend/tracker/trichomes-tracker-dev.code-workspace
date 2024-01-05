@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../../../../trichomes-tracker-dev"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Django-Tutorials-MF"
+		},
+		{
+			"path": "../../../cflj-database"
+		}
+	],
+	"settings": {}
+}
