@@ -12,8 +12,10 @@
 #fi
 
 set -e
-echo "Let's go!"
+echo "Database started. Let's go!"
 python manage.py flush --no-input
+python manage.py makemigrations
 python manage.py migrate
+echo "Migrations made"
 
 exec "$@"
