@@ -98,10 +98,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ.get("SQL_DATABASE", "postgres"),
+        "NAME": os.environ.get("SQL_DATABASE", "cfljdb01"),
         "USER": os.environ.get("SQL_USER", "postgres"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "postgres"),
-        "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "UuEWn=M{jt<E2x&N"),
+        "HOST": os.environ.get("SQL_HOST", "cflj-database-1.cxttdh0c7jal.us-east-1.rds.amazonaws.com"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }

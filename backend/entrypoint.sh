@@ -1,21 +1,16 @@
 #!/bin/sh
 
-#if [ "$DATABASE" = "postgres" ]
-#then
-#    echo "Waiting for postgres..."
-
-#    while ! nc -z $SQL_HOST $SQL_PORT; do
-#      sleep 0.1
-#    done
-
-#    echo "PostgreSQL started" 
-#fi
-
 set -e
-echo "Database started. Let's go!"
+
+# activate our virtual environment here
+. /opt/pysetup/.venv/bin/activate
+
+echo "Let's go!"
 python manage.py flush --no-input
 python manage.py makemigrations
 python manage.py migrate
 echo "Migrations made"
+python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
+python manage.py runserver "0.0.0.0:8000"
 
 exec "$@"
