@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../../../cflj-database"
+		},
+		{
+			"path": "../../../WEBTEMPLATE_Nazox_Ajax_v1.1.0"
 		}
 	],
 	"settings": {}
