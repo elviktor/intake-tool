@@ -48,13 +48,13 @@ function call_ajax_page(page) {
 
 	if(page === "index.html")
 	{
-		document.title = "Dashboard | Nazox - Admin & Dashboard Template";
+		document.title = "Justice Seed";
 	}
 	else
 	{
 		var title = page.replace(".html", "");
 		var title1 = title.replace("-", " ");
-		document.title = title1.charAt(0).toUpperCase() + title1.slice(1) + " | Nazox - Admin & Dashboard Template";
+		document.title = title1.charAt(0).toUpperCase() + title1.slice(1) + " | Justice Seed";
 	}
 
 	$.ajax({
