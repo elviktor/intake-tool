@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.db import models
 import uuid
+from django.utils.crypto import get_random_string
 
 class Book(models.Model):
     title = models.CharField(max_length=250)
@@ -16,9 +17,39 @@ class Book(models.Model):
         return self.title
 
 
-# Note about conversion of Biotrack models:
-# Because Django reserves "id" when I encounter "id" in Biotrack
-# I add a "biotrack_" prefix.   id   >>>   biotrack_id
+# Trichomes Tracker App Models
+# The following section of models are based on the initial DB
+# designed for the Trichomes Tracker App.
+
+class TT_Location(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    deleted = models.BooleanField()
+    external_id = models.CharField(max_length=250, null=True, blank=True)
+    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
+    location_license = models.CharField(max_length=250, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    quarantine = models.BooleanField()
+    transaction_id = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class TT_Sublot(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sublot_name = models.CharField(max_length=250, null=True, blank=True)
+    room = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    amount = models.FloatField(null=True, blank=True)
+    external_id = models.CharField(max_length=250, null=True, blank=True)
+    location_license = models.CharField(max_length=250, null=True, blank=True)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    uom = models.CharField(max_length=250, null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.sublot_name
+
 
 class Strain(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -30,9 +61,135 @@ class Strain(models.Model):
     coa_link = models.CharField(max_length=250, null=True, blank=True)
     thc_amt = models.FloatField(null=True, blank=True)
     cbd_amt = models.FloatField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+class TT_Plant_Batch(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    birth_date = models.DateField(null=True, blank=True)
+    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
+    quantity = models.IntegerField(null=True, blank=True) #Use qty to bulk_create() Biotrack plant models
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
+    mother = models.BooleanField()
+    org_id = models.IntegerField(null=True, blank=True)
+    parent_id = models.CharField(max_length=250, null=True, blank=True)
+    room_id = models.IntegerField(null=True, blank=True)
+    converted = models.BooleanField()
+    deleted = models.BooleanField()
+    destroy_reason = models.CharField(max_length=250, null=True, blank=True)
+    destroy_reason_id = models.IntegerField(null=True, blank=True)
+    destroy_scheduled = models.BooleanField()
+    destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
+    external_id = models.CharField(max_length=250, null=True, blank=True)
+    harvest_scheduled = models.BooleanField()
+    session_time = models.IntegerField(null=True, blank=True)
+    state = models.CharField(max_length=250, null=True, blank=True)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular plant instance."""
+        return reverse('plant_detail', args=[str(self.biotrack_id)])
+    
+    def __str__(self):
+        return f'{self.strain} {self.uid}'
+
+
+class TT_Plant_Batch_Harvest(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    deleted = models.BooleanField()
+    plant_batch = models.ForeignKey(TT_Plant_Batch, on_delete=models.CASCADE)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
+    harvest_stage = models.CharField(max_length=250, null=True, blank=True)
+    harvest_completed = models.BooleanField()
+    harvest_start_date = models.DateField(null=True, blank=True)
+    harvest_finish_date = models.DateField(null=True, blank=True)
+    external_id = models.CharField(max_length=250, null=True, blank=True)
+    harvest_id = models.CharField(max_length=250, null=True, blank=True)
+    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
+    transaction_id = models.IntegerField(null=True, blank=True)
+    total_wet_weight = models.FloatField(null=True, blank=True)
+    total_dry_weight = models.FloatField(null=True, blank=True)
+    remaining_wet_weight = models.FloatField(null=True, blank=True)
+    remaining_wet_weight = models.FloatField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.strain} {self.uid}'
+
+
+class TT_Product_Batch(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
+    product_category = models.CharField(max_length=250, null=True, blank=True)
+    product_name = models.CharField(max_length=250, null=True, blank=True)
+    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
+    available = models.CharField(max_length=250, null=True, blank=True)
+    packaging = models.CharField(max_length=250, null=True, blank=True)
+    wholesale_price = models.DecimalField(null=True, blank=True, decimal_places=2)
+    msrp = models.DecimalField(null=True, blank=True, decimal_places=2)
+    moq = models.IntegerField(null=True, blank=True)
+    thc_percent = models.DecimalField(null=True, blank=True, decimal_places=2)
+    terp_percent = models.DecimalField(null=True, blank=True, decimal_places=2) 
+    thc_mg = models.DecimalField(null=True, blank=True, decimal_places=3)
+    thc_mg_per_serving = models.DecimalField(null=True, blank=True, decimal_places=2)
+    grow_type = models.CharField(max_length=250, null=True, blank=True)
+    image = models.ImageField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    sell_points = models.TextField(null=True, blank=True)
+    expiration_date = models.DateField(null=True, blank=True)
+    use_by_date = models.DateField(null=True, blank=True)
+    sku = models.CharField(max_length=250, null=True, blank=True)
+    coa = models.URLField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.product_name} {self.uid}'
+
+
+
+class TT_Inventory(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    inventory_name = models.CharField(max_length=250, null=True, blank=True)
+    harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
+    product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
+    inventory_type = models.CharField(null=True, blank=True)
+    current_room = models.IntegerField(null=True, blank=True)
+    deleted = models.BooleanField()
+    external_id = models.CharField(max_length=250, null=True, blank=True)
+    biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
+    id_serial = models.IntegerField(null=True, blank=True)
+    location_license = models.CharField(max_length=250, null=True, blank=True)
+    med_usable_weight = models.FloatField(null=True, blank=True)
+    medicated = models.BooleanField()
+    product_name = models.CharField(max_length=250, null=True, blank=True)
+    qa_status = models.CharField(max_length=250, null=True, blank=True)
+    rec_usable_weight = models.FloatField(null=True, blank=True)
+    remaining_amount = models.FloatField(null=True, blank=True)
+    seized = models.BooleanField()
+    session_time = models.IntegerField(null=True, blank=True)
+    status = models.CharField(max_length=250, null=True, blank=True)
+    strain = models.CharField(max_length=250, null=True, blank=True)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    unit_based = models.BooleanField()
+    usable_weight = models.FloatField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.inventory_name} {self.uid}'
+
+# Note about conversion of Biotrack models:
+# Because Django reserves "id" when I encounter "id" in Biotrack
+# I add a "biotrack_" prefix.   id   >>>   biotrack_id
 
 class Plant(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
