@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_product_batch }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Harvest Batch:</strong> {{ tt_product_batch.harvest_batch }}</p>
+        <p><strong>Product Category:</strong> {{ tt_product_batch.product_category }}</p>
+        <p><strong>Available:</strong> {{ tt_product_batch.available }}</p>
+        <p><strong>Packaging:</strong> {{ tt_product_batch.packaging }}</p>
+        <p><strong>Wholesale Price:</strong> {{ tt_product_batch.wholesale_price }}</p>
+        <p><strong>MSRP:</strong> {{ tt_product_batch.msrp }}</p>
+        <p><strong>MOQ:</strong> {{ tt_product_batch.moq }}</p>
+        <p><strong>THC Percentage:</strong> {{ tt_product_batch.thc_percent }}</p>
+        <p><strong>Terpene Percentage:</strong> {{ tt_product_batch.terp_percent }}</p>
+        <p><strong>THC MG:</strong> {{ tt_product_batch.thc_mg }}</p>
+        <p><strong>THC MG Per Serving:</strong> {{ tt_product_batch.thc_mg_per_serving }}</p>
+        <p><strong>Grow Type:</strong> {{ tt_product_batch.grow_type }}</p>
+        <p><strong>Description:</strong> {{ tt_product_batch.description }}</p>
+        <p><strong>Sell Points:</strong> {{ tt_product_batch.sell_points }}</p>
+        <p><strong>Expiration Date:</strong> {{ tt_product_batch.expiration_date }}</p>
+        <p><strong>Use By Date:</strong> {{ tt_product_batch.use_by_date }}</p>
+        <p><strong>SKU:</strong> {{ tt_product_batch.sku }}</p>
+        <p><strong>COA:</strong> {{ tt_product_batch.coa }}</p>      
+        
+        <p><strong>Notes:</strong> {{ tt_product_batch.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

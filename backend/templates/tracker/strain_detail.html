@@ -1,0 +1,34 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ strain }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Short Name:</strong> {{ strain.shortname }}</p>
+        <p><strong>Source:</strong> {{ strain.source }}</p>
+        <p><strong>Type:</strong> {{ strain.type }}</p>
+        <p><strong>Status:</strong> {{ strain.status }}</p>
+        <p><strong>COA Link:</strong> {{ strain.coa_link }}</p>
+        <p><strong>THC Amount:</strong> {{ strain.thc_amt }}</p>
+        <p><strong>CBD Amount:</strong> {{ strain.cbd_amt }}</p>
+       
+        <p><strong>Notes:</strong> {{ strain.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

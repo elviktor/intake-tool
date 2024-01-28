@@ -17,7 +17,7 @@ class Book(models.Model):
         return self.title
 
 
-# Trichomes Tracker App Models
+# Trichomes Tracker App Models8
 # The following section of models are based on the initial DB
 # designed for the Trichomes Tracker App.
 
@@ -31,6 +31,10 @@ class TT_Location(models.Model):
     quarantine = models.BooleanField()
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_location_detail', args=[str(self.id)])
 
     def __str__(self):
         return self.name
@@ -47,6 +51,10 @@ class TT_Sublot(models.Model):
     uom = models.CharField(max_length=250, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_sublot_detail', args=[str(self.id)])
+
     def __str__(self):
         return self.sublot_name
 
@@ -62,6 +70,10 @@ class Strain(models.Model):
     thc_amt = models.FloatField(null=True, blank=True)
     cbd_amt = models.FloatField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('strain_detail', args=[str(self.id)])
 
     def __str__(self):
         return self.name
@@ -95,7 +107,7 @@ class TT_Plant_Batch(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular plant instance."""
-        return reverse('plant_detail', args=[str(self.biotrack_id)])
+        return reverse('tt_plant_batch_detail', args=[str(self.id)])
     
     def __str__(self):
         return f'{self.strain} {self.uid}'
@@ -120,8 +132,12 @@ class TT_Plant_Batch_Harvest(models.Model):
     total_wet_weight = models.FloatField(null=True, blank=True)
     total_dry_weight = models.FloatField(null=True, blank=True)
     remaining_wet_weight = models.FloatField(null=True, blank=True)
-    remaining_wet_weight = models.FloatField(null=True, blank=True)
+    remaining_dry_weight = models.FloatField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_plant_batch_harvest_detail', args=[str(self.id)])
 
     def __str__(self):
         return f'{self.strain} {self.uid}'
@@ -151,6 +167,10 @@ class TT_Product_Batch(models.Model):
     coa = models.URLField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_product_batch_detail', args=[str(self.id)])
+
     def __str__(self):
         return f'{self.product_name} {self.uid}'
 
@@ -162,7 +182,8 @@ class TT_Inventory(models.Model):
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
     product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
     inventory_type = models.CharField(max_length=250, null=True, blank=True)
-    current_room = models.IntegerField(null=True, blank=True)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     deleted = models.BooleanField()
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
@@ -177,11 +198,15 @@ class TT_Inventory(models.Model):
     seized = models.BooleanField()
     session_time = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=250, null=True, blank=True)
-    strain = models.CharField(max_length=250, null=True, blank=True)
+    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
     transaction_id = models.IntegerField(null=True, blank=True)
     unit_based = models.BooleanField()
     usable_weight = models.FloatField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_inventory_detail', args=[str(self.id)])
 
     def __str__(self):
         return f'{self.inventory_name} {self.uid}'
@@ -214,7 +239,7 @@ class Plant(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular plant instance."""
-        return reverse('plant_detail', args=[str(self.biotrack_id)])
+        return reverse('plant_detail', args=[str(self.id)])
     
     def __str__(self):
         return self.biotrack_id

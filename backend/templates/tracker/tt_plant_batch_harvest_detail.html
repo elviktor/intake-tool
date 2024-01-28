@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_plant_batch_harvest }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Plant Batch:</strong> {{ tt_plant_batch_harvest.plant_batch }}</p>
+        <p><strong>Deleted:</strong> {{ tt_plant_batch_harvest.deleted }}</p>
+        <p><strong>Location:</strong> {{ tt_plant_batch_harvest.location }}</p>
+        <p><strong>Sublot:</strong> {{ tt_plant_batch_harvest.sublot }}</p>
+        <p><strong>From Row:</strong> {{ tt_plant_batch_harvest.from_row }}</p>
+        <p><strong>To Row:</strong> {{ tt_plant_batch_harvest.to_row }}</p>
+        <p><strong>Harvest ID:</strong> {{ tt_plant_batch_harvest.harvest_id }}</p>
+        <p><strong>Harvest Stage:</strong> {{ tt_plant_batch_harvest.harvest_stage }}</p>
+        <p><strong>Harvest Completed:</strong> {{ tt_plant_batch_harvest.harvest_completed }}</p>
+        <p><strong>Harvest Start Date:</strong> {{ tt_plant_batch_harvest.harvest_start_date }}</p>
+        <p><strong>Harvest Finish Date:</strong> {{ tt_plant_batch_harvest.harvest_finish_date }}</p>
+        <p><strong>Total Wet Weight:</strong> {{ tt_plant_batch_harvest.total_wet_weight }}</p>
+        <p><strong>Total Dry Weight:</strong> {{ tt_plant_batch_harvest.total_dry_weight }}</p>
+        <p><strong>Remaining Wet Weight:</strong> {{ tt_plant_batch_harvest.remaining_wet_weight }}</p>
+        <p><strong>Remaining Dry Weight:</strong> {{ tt_plant_batch_harvest.remaining_dry_weight }}</p>
+        <p><strong>Bio Track ID:</strong> {{ tt_plant_batch_harvest.biotrack_id }}</p>
+        <p><strong>External ID:</strong> {{ tt_plant_batch_harvest.external_id }}</p>
+        <p><strong>Transaction ID:</strong> {{ tt_plant_batch_harvest.transaction_id }}</p>
+       
+        <p><strong>Notes:</strong> {{ tt_plant_batch_harvest.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

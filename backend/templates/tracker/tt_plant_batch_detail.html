@@ -1,0 +1,49 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_plant_batch }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Birth Date:</strong> {{ tt_plant_batch.birth_date }}</p>
+        <p><strong>Strain:</strong> {{ tt_plant_batch.strain }}</p>
+        <p><strong>Quantity:</strong> {{ tt_plant_batch.quantity }}</p>
+        <p><strong>Location:</strong> {{ tt_plant_batch.location }}</p>
+        <p><strong>Sublot:</strong> {{ tt_plant_batch.sublot }}</p>
+        <p><strong>From Row:</strong> {{ tt_plant_batch.from_row }}</p>
+        <p><strong>To Row:</strong> {{ tt_plant_batch.to_row }}</p>
+        <p><strong>Mother:</strong> {{ tt_plant_batch.mother }}</p>
+        <p><strong>Original ID:</strong> {{ tt_plant_batch.org_id }}</p>
+        <p><strong>Parent ID:</strong> {{ tt_plant_batch.parent_id }}</p>
+        <p><strong>External ID:</strong> {{ tt_plant_batch.external_id }}</p>
+        <p><strong>Room ID:</strong> {{ tt_plant_batch.room_id }}</p>
+        <p><strong>Converted:</strong> {{ tt_plant_batch.converted }}</p>
+        <p><strong>Deleted:</strong> {{ tt_plant_batch.deleted }}</p>
+        <p><strong>Destroy Reason:</strong> {{ tt_plant_batch.destroy_reason }}</p>
+        <p><strong>Destroy Reason ID:</strong> {{ tt_plant_batch.destroy_reason_id }}</p>
+        <p><strong>Destroy Scheduled:</strong> {{ tt_plant_batch.destroy_scheduled }}</p>
+        <p><strong>Destroy Scheduled Time:</strong> {{ tt_plant_batch.destroy_scheduled_time }}</p>
+        <p><strong>Harvest Scheduled:</strong> {{ tt_plant_batch.harvest_scheduled }}</p>
+        <p><strong>Session Time:</strong> {{ tt_plant_batch.session_time }}</p>
+        <p><strong>State:</strong> {{ tt_plant_batch.state }}</p>
+        <p><strong>Transaction ID:</strong> {{ tt_plant_batch.transaction_id }}</p>
+       
+        <p><strong>Notes:</strong> {{ tt_plant_batch.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
