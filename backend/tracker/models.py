@@ -34,7 +34,7 @@ class TT_Location(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('tt_location_detail', args=[str(self.id)])
+        return reverse('tt_location_detail', args=[str(self.uid)])
 
     def __str__(self):
         return self.name
@@ -53,7 +53,7 @@ class TT_Sublot(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('tt_sublot_detail', args=[str(self.id)])
+        return reverse('tt_sublot_detail', args=[str(self.uid)])
 
     def __str__(self):
         return self.sublot_name
@@ -73,7 +73,7 @@ class Strain(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('strain_detail', args=[str(self.id)])
+        return reverse('strain_detail', args=[str(self.uid)])
 
     def __str__(self):
         return self.name
@@ -107,7 +107,7 @@ class TT_Plant_Batch(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular plant instance."""
-        return reverse('tt_plant_batch_detail', args=[str(self.id)])
+        return reverse('tt_plant_batch_detail', args=[str(self.uid)])
     
     def __str__(self):
         return f'{self.strain} {self.uid}'
@@ -137,7 +137,7 @@ class TT_Plant_Batch_Harvest(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('tt_plant_batch_harvest_detail', args=[str(self.id)])
+        return reverse('tt_plant_batch_harvest_detail', args=[str(self.uid)])
 
     def __str__(self):
         return f'{self.strain} {self.uid}'
@@ -169,7 +169,7 @@ class TT_Product_Batch(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('tt_product_batch_detail', args=[str(self.id)])
+        return reverse('tt_product_batch_detail', args=[str(self.uid)])
 
     def __str__(self):
         return f'{self.product_name} {self.uid}'
@@ -206,7 +206,7 @@ class TT_Inventory(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
-        return reverse('tt_inventory_detail', args=[str(self.id)])
+        return reverse('tt_inventory_detail', args=[str(self.uid)])
 
     def __str__(self):
         return f'{self.inventory_name} {self.uid}'

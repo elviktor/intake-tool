@@ -1,0 +1,32 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ inventory_sublot }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Sublot Name:</strong> {{ inventory_sublot.sublot_name }}</p>
+        <p><strong>Amount:</strong> {{ inventory_sublot.amount }}</p>
+        <p><strong>External ID:</strong> {{ inventory_sublot.external_id }}</p>
+        <p><strong>Location License:</strong> {{ inventory_sublot.location_license }}</p>
+        <p><strong>Transaction ID:</strong> {{ inventory_sublot.transaction_id }}</p>
+        <p><strong>UOM:</strong> {{ inventory_sublot.uom }}</p>
+                
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ inventory_move }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Cure ID:</strong> {{ inventory_move.cure_id }}</p>
+        <p><strong>Deleted:</strong> {{ inventory_move.deleted }}</p>
+        <p><strong>Derivative:</strong> {{ inventory_move.derivative }}</p>
+        <p><strong>External ID:</strong> {{ inventory_move.external_id }}</p>
+        <p><strong>Biotrack ID:</strong> {{ inventory_move.biotrack_id }}</p>
+        <p><strong>Transaction ID:</strong> {{ inventory_move.transaction_id }}</p>
+        
+                        
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

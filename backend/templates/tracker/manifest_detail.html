@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ manifest }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>City:</strong> {{ manifest.city }}</p>
+        <p><strong>Completed:</strong> {{ manifest.completed }}</p>
+        <p><strong>Completion Date:</strong> {{ manifest.completion_date }}</p>
+        <p><strong>Created On:</strong> {{ manifest.created_on }}</p>
+        <p><strong>Deleted:</strong> {{ manifest.deleted }}</p>
+        <p><strong>Driver Arrived:</strong> {{ manifest.driver_arrived }}</p>
+        <p><strong>Drivers:</strong> {{ manifest.drivers }}</p>
+        <p><strong>In Transit:</strong> {{ manifest.in_transit }}</p>
+        <p><strong>Is Accepted:</strong> {{ manifest.is_accepted }}</p>
+        <p><strong>Is Parked:</strong> {{ manifest.is_parked }}</p>
+        <p><strong>License Number:</strong> {{ manifest.license_number }}</p>
+        <p><strong>Manifest Id:</strong> {{ manifest.manifest_id }}</p>
+        <p><strong>Name:</strong> {{ manifest.name }}</p>
+        <p><strong>Phone:</strong> {{ manifest.phone }}</p>
+        <p><strong>Received:</strong> {{ manifest.received }}</p>
+        <p><strong>Session Time:</strong> {{ manifest.session_time }}</p>
+        <p><strong>State:</strong> {{ manifest.state }}</p>
+        <p><strong>Stop Count:</strong> {{ manifest.stop_count }}</p>
+        <p><strong>Stops:</strong> {{ manifest.stops }}</p>
+        <p><strong>Streets:</strong> {{ manifest.streets }}</p>
+        <p><strong>Third Party Transporter:</strong> {{ manifest.third_party_transporter }}</p>
+        <p><strong>Total Item Count:</strong> {{ manifest.total_item_count }}</p>
+        <p><strong>Transaction ID:</strong> {{ manifest.transaction_id }}</p>
+        <p><strong>Type:</strong> {{ manifest.type }}</p>
+        <p><strong>Updated On:</strong> {{ manifest.updated_on }}</p>
+        <p><strong>Vehicle:</strong> {{ manifest.vehicle }}</p>
+        <p><strong>Zip:</strong> {{ manifest.zip }}</p>
+        
+                                                                          
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

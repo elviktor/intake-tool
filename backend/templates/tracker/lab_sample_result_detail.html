@@ -1,0 +1,34 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ lab_sample_result }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Bio Track ID:</strong> {{ lab_sample_result.biotrack_id }}</p>        
+        <p><strong>Lab Provided:</strong> {{ lab_sample_result.lab_provided }}</p>        
+        <p><strong>Sample ID:</strong> {{ lab_sample_result.sample_id }}</p>        
+        <p><strong>Test ID:</strong> {{ lab_sample_result.test_id }}</p>        
+        <p><strong>Test Panel:</strong> {{ lab_sample_result.test_panel }}</p>        
+        <p><strong>Test Pass:</strong> {{ lab_sample_result.test_pass }}</p>        
+        <p><strong>Test Value:</strong> {{ lab_sample_result.test_value }}</p>        
+        <p><strong>Transaction ID:</strong> {{ lab_sample_result.transaction_id }}</p>        
+        
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
