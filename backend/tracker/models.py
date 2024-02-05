@@ -431,7 +431,7 @@ class TT_Storage_Batch(models.Model):
 class TT_Product_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
-    storage_batches = models.ManyToManyField(TT_Storage_Batch, on_delete=models.CASCADE)
+    storage_batches = models.ManyToManyField(TT_Storage_Batch)
     # Select if product uses WET (fresh frozen) or DRY (flower) cannabis
     wet_dry = models.CharField(max_length=3, null=True, blank=True)
     product_category = models.CharField(max_length=250, null=True, blank=True)
@@ -576,7 +576,7 @@ class Manifest_Stop(models.Model):
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
     biotrack_invoice_id = models.CharField(max_length=250, null=True, blank=True) #Original BiotrackAPI key = 'invoice_id'
-    items = models.ManyToManyField(Stop_Item, on_delete=models.CASCADE)
+    items = models.ManyToManyField(Stop_Item)
     items_count = models.IntegerField(null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     manifest_id = models.CharField(max_length=250, null=True, blank=True)
@@ -625,7 +625,7 @@ class Manifest(models.Model):
     session_time = models.IntegerField(null=True, blank=True)
     state = models.CharField(max_length=250, null=True, blank=True)
     stop_count = models.IntegerField(null=True, blank=True)
-    stops = models.ManyToManyField(Manifest_Stop, on_delete=models.CASCADE)
+    stops = models.ManyToManyField(Manifest_Stop)
     street = models.CharField(max_length=250, null=True, blank=True)
     third_party_transporter = models.ForeignKey(Manifest_ThirdPartyTransporter, on_delete=models.CASCADE)
     total_item_count = models.IntegerField(null=True, blank=True)
