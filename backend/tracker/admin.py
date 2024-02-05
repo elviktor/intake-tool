@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, Plant, Strain, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Product_Batch, TT_Inventory
+from .models import Book, Plant, Strain, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch, TT_Product_Batch, TT_Inventory, TT_Lab_Sample
 
 admin.site.register(Book)
 admin.site.register(Plant)
@@ -28,5 +28,7 @@ admin.site.register(TT_Location)
 admin.site.register(TT_Sublot)
 admin.site.register(TT_Plant_Batch)
 admin.site.register(TT_Plant_Batch_Harvest)
+admin.site.register(TT_Storage_Batch)
 admin.site.register(TT_Product_Batch)
 admin.site.register(TT_Inventory)
+admin.site.register(TT_Lab_Sample)

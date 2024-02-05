@@ -1,0 +1,41 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_storage_batch }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Harvest Batch:</strong> {{ tt_storage_batch.harvest_batch }}</p>
+        <p><strong>Package Number:</strong> {{ tt_storage_batch.package_number }}</p>
+        <p><strong>Location Date:</strong> {{ tt_storage_batch.location_date }}</p>
+        <p><strong>Wet or Dry Cannabis:</strong> {{ tt_storage_batch.wet_dry }}</p>
+        <p><strong>Produce Category:</strong> {{ tt_storage_batch.produce_category }}</p>
+        <p><strong>Weight:</strong> {{ tt_storage_batch.weight }}</p>
+        <p><strong>Status:</strong> {{ tt_storage_batch.status }}</p>
+        <p><strong>Converted:</strong> {{ tt_storage_batch.converted }}</p>
+        <p><strong>Deleted:</strong> {{ tt_storage_batch.deleted }}</p>
+        <p><strong>Destroy Reason:</strong> {{ tt_storage_batch.destroy_reason }}</p>
+        <p><strong>Destroy Reason ID:</strong> {{ tt_storage_batch.destroy_reason_id }}</p>
+        <p><strong>Destroy Scheduled:</strong> {{ tt_storage_batch.destroy_scheduled }}</p>
+        <p><strong>Destroy Scheduled Time:</strong> {{ tt_storage_batch.destroy_scheduled_time }}</p>
+        
+
+        <p><strong>Notes:</strong> {{ tt_storage_batch.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

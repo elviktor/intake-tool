@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views import generic
-from .models import Book, Strain, TT_Inventory, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Product_Batch, TT_Sublot, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
+from .models import Book, Strain, TT_Inventory, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
 
 class BookListView(ListView):
     model = Book
@@ -38,6 +38,11 @@ class TTPlantBatchHarvestDetailView(LoginRequiredMixin,generic.DetailView):
     model = TT_Plant_Batch_Harvest
 
 
+class TTStorageBatchDetailView(LoginRequiredMixin,generic.DetailView):
+    """Generic class-based detail view."""
+    model = TT_Storage_Batch
+
+
 class TTProductBatchDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""
     model = TT_Product_Batch
@@ -46,6 +51,11 @@ class TTProductBatchDetailView(LoginRequiredMixin,generic.DetailView):
 class TTSublotDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""
     model = TT_Sublot
+
+
+class TTLabSampleDetailView(LoginRequiredMixin,generic.DetailView):
+    """Generic class-based detail view."""
+    model = TT_Lab_Sample
 
 
 class PlantDetailView(LoginRequiredMixin,generic.DetailView):

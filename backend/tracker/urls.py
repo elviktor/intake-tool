@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BookListView, PlantListView, StrainDetailView, TTInventoryDetailView, TTLocationDetailView, TTPlantBatchDetailView, TTPlantBatchHarvestDetailView, TTProductBatchDetailView, TTSublotDetailView, PlantDetailView, WeightDetailView, DerivativeDetailView, PlantHarvestDetailView, LabResultDetailView, LabSampleResultDetailView, LabSampleDetailView, InventoryDetailView, InventoryRoomDetailView, InventorySublotDetailView, InventoryMoveDetailView, PlantCureDetailView, InvoiceInventoryDetailView, InvoiceModelDetailView, ManifestDriverDetailView, StopItemDetailView, ManifestStopDetailView, ManifestVehicleDetailView, ManifestThirdPartyTransporterDetailView, ManifestDetailView, GrowRoomDetailView
+from .views import BookListView, PlantListView, StrainDetailView, TTInventoryDetailView, TTLocationDetailView, TTPlantBatchDetailView, TTPlantBatchHarvestDetailView, TTProductBatchDetailView, TTSublotDetailView, TTStorageBatchDetailView, TTLabSampleDetailView,PlantDetailView, WeightDetailView, DerivativeDetailView, PlantHarvestDetailView, LabResultDetailView, LabSampleResultDetailView, LabSampleDetailView, InventoryDetailView, InventoryRoomDetailView, InventorySublotDetailView, InventoryMoveDetailView, PlantCureDetailView, InvoiceInventoryDetailView, InvoiceModelDetailView, ManifestDriverDetailView, StopItemDetailView, ManifestStopDetailView, ManifestVehicleDetailView, ManifestThirdPartyTransporterDetailView, ManifestDetailView, GrowRoomDetailView
 
 urlpatterns = [ 
     path('', BookListView.as_view(), name='book_list'),
@@ -16,8 +16,12 @@ urlpatterns = [
          TTPlantBatchHarvestDetailView.as_view(), name='tt_plant_batch_harvest_detail'),
     path('tt_product_batch/<str:pk>',
          TTProductBatchDetailView.as_view(), name='tt_product_batch_detail'),
+    path('tt_storage_batch/<str:pk>',
+         TTStorageBatchDetailView.as_view(), name='tt_storage_batch_detail'),
     path('tt_sublot/<str:pk>',
          TTSublotDetailView.as_view(), name='tt_sublot_detail'),
+    path('tt_lab_sample/<str:pk>',
+         TTLabSampleDetailView.as_view(), name='tt_lab_sample_detail'),
     path('plant/<str:pk>',
          PlantDetailView.as_view(), name='plant_detail'),
     path('weight/<str:pk>',

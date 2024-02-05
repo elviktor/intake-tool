@@ -1,0 +1,47 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_lab_sample }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Product Batch:</strong> {{ tt_lab_sample.product_batch }}</p> 
+        <p><strong>Active:</strong> {{ tt_lab_sample.active }}</p>        
+        <p><strong>Amount:</strong> {{ tt_lab_sample.amount }}</p>        
+        <p><strong>Amount Used:</strong> {{ tt_lab_sample.amount_used }}</p>        
+        <p><strong>Deleted:</strong> {{ tt_lab_sample.deleted }}</p>        
+        <p><strong>Bio Track ID:</strong> {{ tt_lab_sample.biotrack_id }}</p>        
+        <p><strong>Inventory ID:</strong> {{ tt_lab_sample.inventory_id }}</p>        
+        <p><strong>Inventory Type:</strong> {{ tt_lab_sample.inventory_type }}</p>        
+        <p><strong>Lab License:</strong> {{ tt_lab_sample.lab_license }}</p>        
+        <p><strong>Location License:</strong> {{ tt_lab_sample.location_license }}</p>        
+        <p><strong>Medical Grade:</strong> {{ tt_lab_sample.medical_grade }}</p>        
+        <p><strong>Parent ID:</strong> {{ tt_lab_sample.parent_id }}</p>        
+        <p><strong>Result:</strong> {{ tt_lab_sample.result }}</p>        
+        <p><strong>Results:</strong> {{ tt_lab_sample.results }}</p>        
+        <p><strong>RN D:</strong> {{ tt_lab_sample.rn_d }}</p>        
+        <p><strong>Sample Use:</strong> {{ tt_lab_sample.sample_use }}</p>        
+        <p><strong>Session Time:</strong> {{ tt_lab_sample.session_time }}</p>        
+        <p><strong>Test Results:</strong> {{ tt_lab_sample.test_results }}</p>        
+        <p><strong>Transaction ID:</strong> {{ tt_lab_sample.transaction_id }}</p>
+        <p><strong>Notes:</strong> {{ tt_lab_sample.notes }}</p>         
+             
+        
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
