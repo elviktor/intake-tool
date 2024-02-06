@@ -425,7 +425,7 @@ class TT_Storage_Batch(models.Model):
         return reverse('tt_storage_batch_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.harvest_batch} {str(self.package_number)}'
+        return f'{self.produce_category} {str(self.package_number)}'
 
 
 class TT_Product_Batch(models.Model):

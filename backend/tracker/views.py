@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.views.generic import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views import generic
+from django.forms.models import ModelForm
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 from .models import Book, Strain, TT_Inventory, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
 
 class BookListView(ListView):
@@ -41,6 +44,17 @@ class TTPlantBatchHarvestDetailView(LoginRequiredMixin,generic.DetailView):
 class TTStorageBatchDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""
     model = TT_Storage_Batch
+
+#https://stackoverflow.com/questions/53742129/how-do-you-modify-form-data-before-saving-it-while-using-djangos-createview
+
+class TTStorageBatchForm(ModelForm):
+   class Meta:
+      model = TT_Storage_Batch
+      fields = '__all__'
+
+
+class TTStorageBatchCreateView(LoginRequiredMixin,CreateView):
+    form_class = TTStorageBatchForm
 
 
 class TTProductBatchDetailView(LoginRequiredMixin,generic.DetailView):
