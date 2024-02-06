@@ -55,7 +55,8 @@ class TTStorageBatchForm(ModelForm):
 
 class TTStorageBatchCreateView(LoginRequiredMixin,CreateView):
     form_class = TTStorageBatchForm
-
+    template_name = 'tracker/tt_storage_batch_form.html'
+    
 
 class TTProductBatchDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""

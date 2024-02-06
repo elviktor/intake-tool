@@ -66,7 +66,7 @@ urlpatterns = [
          GrowRoomDetailView.as_view(), name='grow_room_detail'),
 
     path('tt_storage_batch/create/',  
-          TTStorageBatchCreateView.as_view(), name='tt_storage_batch_create'),
+          TTStorageBatchCreateView.as_view(), name='tt_storage_batch_form'),
     
 
 ]
