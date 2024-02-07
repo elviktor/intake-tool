@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BookListView, PlantListView, StrainDetailView, TTInventoryDetailView, TTLocationDetailView, TTPlantBatchDetailView, TTPlantBatchHarvestDetailView, TTProductBatchDetailView, TTSublotDetailView, TTStorageBatchDetailView, TTLabSampleDetailView, TTStorageBatchCreateView, PlantDetailView, WeightDetailView, DerivativeDetailView, PlantHarvestDetailView, LabResultDetailView, LabSampleResultDetailView, LabSampleDetailView, InventoryDetailView, InventoryRoomDetailView, InventorySublotDetailView, InventoryMoveDetailView, PlantCureDetailView, InvoiceInventoryDetailView, InvoiceModelDetailView, ManifestDriverDetailView, StopItemDetailView, ManifestStopDetailView, ManifestVehicleDetailView, ManifestThirdPartyTransporterDetailView, ManifestDetailView, GrowRoomDetailView
+from .views import BookListView, PlantListView, StrainDetailView, TTInventoryDetailView, TTLocationDetailView, TTPlantBatchDetailView, TTPlantBatchHarvestDetailView, TTProductBatchDetailView, TTSublotDetailView, TTStorageBatchDetailView, TTLabSampleDetailView, TTStorageBatchCreateView, store_produce, PlantDetailView, WeightDetailView, DerivativeDetailView, PlantHarvestDetailView, LabResultDetailView, LabSampleResultDetailView, LabSampleDetailView, InventoryDetailView, InventoryRoomDetailView, InventorySublotDetailView, InventoryMoveDetailView, PlantCureDetailView, InvoiceInventoryDetailView, InvoiceModelDetailView, ManifestDriverDetailView, StopItemDetailView, ManifestStopDetailView, ManifestVehicleDetailView, ManifestThirdPartyTransporterDetailView, ManifestDetailView, GrowRoomDetailView
 
 urlpatterns = [ 
     path('', BookListView.as_view(), name='book_list'),
@@ -67,6 +67,8 @@ urlpatterns = [
 
     path('tt_storage_batch/create/',  
           TTStorageBatchCreateView.as_view(), name='tt_storage_batch_form'),
+
+     path('forms/store_produce/', store_produce, name='tt_store_produce_form'),
     
 
 ]

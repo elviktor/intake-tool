@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views import generic
-from django.forms.models import ModelForm
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from .forms import TTStorageBatchForm
 from .models import Book, Strain, TT_Inventory, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
 
 class BookListView(ListView):
@@ -47,15 +47,35 @@ class TTStorageBatchDetailView(LoginRequiredMixin,generic.DetailView):
 
 #https://stackoverflow.com/questions/53742129/how-do-you-modify-form-data-before-saving-it-while-using-djangos-createview
 
-class TTStorageBatchForm(ModelForm):
-   class Meta:
-      model = TT_Storage_Batch
-      fields = '__all__'
+def store_produce(request, uid):
+    storage_batch = TT_Storage_Batch.objects.get(pk=uid)
+
+    if request.method == 'POST':
+        form = TTStorageBatchForm(request.POST, instance=storage_batch)
+        if form.is_valid():
+            weight = form.cleaned_data['weight'] 
+            harvest_batch = storage_batch.harvest_batch
+            harvest_batch.remaining_dry_weight -= weight
+            harvest_batch.save()
+            form.save()
+            return redirect('home')
+    else:
+        form = TTStorageBatchForm(instance=storage_batch)
+
+    return render(request, 'store_produce.html', {'form': form, 'storage_batch': storage_batch})
+
 
 
 class TTStorageBatchCreateView(LoginRequiredMixin,CreateView):
     form_class = TTStorageBatchForm
     template_name = 'tracker/tt_storage_batch_form.html'
+    success_url = "home"
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        form.weight_transfer()
+        return super().form_valid(form)
     
 
 class TTProductBatchDetailView(LoginRequiredMixin,generic.DetailView):
