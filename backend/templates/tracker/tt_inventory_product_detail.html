@@ -1,0 +1,47 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_inventory_product }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>Inventory:</strong> {{ tt_inventory_product.inventory }}</p> 
+        <p><strong>Product Batch:</strong> {{ tt_inventory_product.product_batch }}</p> 
+        <p><strong>Product Name:</strong> {{ tt_inventory_product.product_name }}</p>
+        <p><strong>Deleted:</strong> {{ tt_inventory_product.deleted }}</p>
+        <p><strong>Status:</strong> {{ tt_inventory_product.status }}</p>
+        <p><strong>QA Status:</strong> {{ tt_inventory_product.qa_status }}</p>
+        <p><strong>Total Quantity:</strong> {{ tt_inventory_product.total_quantity }}</p>
+        <p><strong>Remaining Quantity:</strong> {{ tt_inventory_product.remaining_quantity }}</p>
+        <p><strong>Total Amount:</strong> {{ tt_inventory_product.total_amount }}</p>
+        <p><strong>Remaining Amount:</strong> {{ tt_inventory_product.remaining_amount }}</p>
+        <p><strong>Unit Based:</strong> {{ tt_inventory_product.unit_based }}</p>
+        <p><strong>Usable Weight:</strong> {{ tt_inventory_product.usable_weight }}</p>
+        <p><strong>Rec Usable Weight:</strong> {{ tt_inventory_product.rec_usable_weight }}</p>
+        <p><strong>Med Usable Weight:</strong> {{ tt_inventory_product.med_usable_weight }}</p>
+        <p><strong>Medicated:</strong> {{ tt_inventory_product.medicated }}</p>
+        <p><strong>Seized:</strong> {{ tt_inventory_product.seized }}</p>
+        <p><strong>Session Time:</strong> {{ tt_inventory_product.session_time }}</p>
+        <p><strong>Transaction ID:</strong> {{ tt_inventory_product.transaction_id }}</p>
+        
+
+
+        <p><strong>Notes:</strong> {{ tt_inventory_product.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

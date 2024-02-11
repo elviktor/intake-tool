@@ -45,17 +45,17 @@ class Strain(models.Model):
 class Plant(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     birth_date = models.DateField(null=True, blank=True)
-    converted = models.BooleanField()
-    deleted = models.BooleanField()
+    converted = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
-    destroy_scheduled = models.BooleanField()
+    destroy_scheduled = models.BooleanField(default=False)
     destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
-    harvest_scheduled = models.BooleanField()
+    harvest_scheduled = models.BooleanField(default=False)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
     location = models.CharField(max_length=250, null=True, blank=True)
-    mother = models.BooleanField()
+    mother = models.BooleanField(default=False)
     org_id = models.IntegerField(null=True, blank=True)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     room_id = models.IntegerField(null=True, blank=True)
@@ -84,10 +84,10 @@ class Weight(models.Model):
 class Derivative(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     accounted_for = models.IntegerField(null=True, blank=True)
-    additional_collections = models.BooleanField()
-    cure_collections = models.BooleanField()
+    additional_collections = models.BooleanField(default=False)
+    cure_collections = models.BooleanField(default=False)
     deleted = models.IntegerField(null=True, blank=True)
-    harvest_collections = models.BooleanField()
+    harvest_collections = models.BooleanField(default=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
@@ -103,7 +103,7 @@ class Derivative(models.Model):
 
 class Plant_Harvest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     derivative = models.ForeignKey(Derivative, on_delete=models.CASCADE)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     harvest_id = models.CharField(max_length=250, null=True, blank=True)
@@ -116,7 +116,7 @@ class Plant_Harvest(models.Model):
 
 class Lab_Result(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    failure = models.BooleanField()
+    failure = models.BooleanField(default=False)
     name = models.CharField(max_length=250, null=True, blank=True)
     sample_id = models.IntegerField(null=True, blank=True)
     test = models.IntegerField(null=True, blank=True)
@@ -130,11 +130,11 @@ class Lab_Result(models.Model):
 class Lab_Sample_Result(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
-    lab_provided = models.BooleanField()
+    lab_provided = models.BooleanField(default=False)
     sample_id = models.IntegerField(null=True, blank=True)
     test_id = models.IntegerField(null=True, blank=True)
     test_panel = models.CharField(max_length=250, null=True, blank=True)
-    test_pass = models.BooleanField()
+    test_pass = models.BooleanField(default=False)
     test_value = models.FloatField(null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
 
@@ -144,20 +144,20 @@ class Lab_Sample_Result(models.Model):
 
 class Lab_Sample(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    active = models.BooleanField()
+    active = models.BooleanField(default=False)
     amount = models.FloatField(null=True, blank=True)
     amount_used = models.FloatField(null=True, blank=True)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     inventory_type = models.IntegerField(null=True, blank=True)
     lab_license = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
-    medical_grade = models.BooleanField()
+    medical_grade = models.BooleanField(default=False)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     result = models.CharField(max_length=250, null=True, blank=True)
     results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
-    rn_d = models.BooleanField()
+    rn_d = models.BooleanField(default=False)
     sample_use = models.CharField(max_length=250, null=True, blank=True)
     session_time = models.IntegerField(null=True, blank=True)
     test_results = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
@@ -170,7 +170,7 @@ class Inventory(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     inventory_name = models.CharField(max_length=250, null=True, blank=True)
     current_room = models.IntegerField(null=True, blank=True)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
     id_serial = models.IntegerField(null=True, blank=True)
@@ -178,17 +178,17 @@ class Inventory(models.Model):
     lab_sample = models.ForeignKey(Lab_Sample, on_delete=models.CASCADE)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     med_usable_weight = models.FloatField(null=True, blank=True)
-    medicated = models.BooleanField()
+    medicated = models.BooleanField(default=False)
     product_name = models.CharField(max_length=250, null=True, blank=True)
     qa_status = models.CharField(max_length=250, null=True, blank=True)
     rec_usable_weight = models.FloatField(null=True, blank=True)
     remaining_amount = models.FloatField(null=True, blank=True)
-    seized = models.BooleanField()
+    seized = models.BooleanField(default=False)
     session_time = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=250, null=True, blank=True)
     strain = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
-    unit_based = models.BooleanField()
+    unit_based = models.BooleanField(default=False)
     usable_weight = models.FloatField(null=True, blank=True)
 
     def __str__(self):
@@ -197,12 +197,12 @@ class Inventory(models.Model):
 
 class Inventory_Room(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     location_license = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250, null=True, blank=True)
-    quarantine = models.BooleanField()
+    quarantine = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
@@ -232,7 +232,7 @@ class Inventory_Move(models.Model):
 class Plant_Cure(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cure_id = models.CharField(max_length=250, null=True, blank=True)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     derivative = models.ForeignKey(Derivative, on_delete=models.CASCADE)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
@@ -245,7 +245,7 @@ class Plant_Cure(models.Model):
 class Invoice_Inventory(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.FloatField(null=True, blank=True)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     invoice_id = models.CharField(max_length=250, null=True, blank=True)
@@ -258,14 +258,14 @@ class Invoice_Inventory(models.Model):
 
 class Invoice_Model(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    accepted = models.BooleanField()
+    accepted = models.BooleanField(default=False)
     buyer_location_license = models.CharField(max_length=250, null=True, blank=True)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     inventory = models.ForeignKey(Invoice_Inventory, on_delete=models.CASCADE)
     invoice_id = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     refund_invoice_id = models.CharField(max_length=250, null=True, blank=True)
-    refunded = models.BooleanField()
+    refunded = models.BooleanField(default=False)
     session_time = models.IntegerField(null=True, blank=True) 
     transaction_id = models.IntegerField(null=True, blank=True) 
 
@@ -275,7 +275,7 @@ class Invoice_Model(models.Model):
 
 class Grow_Room(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     location_license = models.CharField(max_length=250, null=True, blank=True)
@@ -293,12 +293,12 @@ class Grow_Room(models.Model):
 
 class TT_Location(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     location_license = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250, null=True, blank=True)
-    quarantine = models.BooleanField()
+    quarantine = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
@@ -313,7 +313,7 @@ class TT_Location(models.Model):
 class TT_Sublot(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sublot_name = models.CharField(max_length=250, null=True, blank=True)
-    room = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     amount = models.FloatField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
@@ -338,18 +338,18 @@ class TT_Plant_Batch(models.Model):
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     from_row = models.IntegerField(null=True, blank=True)
     to_row = models.IntegerField(null=True, blank=True)
-    mother = models.BooleanField()
+    mother = models.BooleanField(default=False)
     org_id = models.IntegerField(null=True, blank=True)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     room_id = models.IntegerField(null=True, blank=True)
-    converted = models.BooleanField()
-    deleted = models.BooleanField()
+    converted = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
-    destroy_scheduled = models.BooleanField()
+    destroy_scheduled = models.BooleanField(default=False)
     destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
-    harvest_scheduled = models.BooleanField()
+    harvest_scheduled = models.BooleanField(default=False)
     session_time = models.IntegerField(null=True, blank=True)
     state = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
@@ -365,14 +365,14 @@ class TT_Plant_Batch(models.Model):
 
 class TT_Plant_Batch_Harvest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     plant_batch = models.ForeignKey(TT_Plant_Batch, on_delete=models.CASCADE)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     from_row = models.IntegerField(null=True, blank=True)
     to_row = models.IntegerField(null=True, blank=True)
     harvest_stage = models.CharField(max_length=250, null=True, blank=True)
-    harvest_completed = models.BooleanField()
+    harvest_completed = models.BooleanField(default=False)
     harvest_start_date = models.DateField(null=True, blank=True)
     harvest_finish_date = models.DateField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
@@ -393,7 +393,7 @@ class TT_Plant_Batch_Harvest(models.Model):
         return reverse('tt_plant_batch_harvest_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.strain} {self.uid}'
+        return f'{self.plant_batch.strain} {self.uid}'
 
 
 class TT_Storage_Batch(models.Model):
@@ -401,6 +401,10 @@ class TT_Storage_Batch(models.Model):
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
     package_number = models.IntegerField(null=True, blank=True)
     location_date = models.DateField(null=True, blank=True)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
     # Select if product uses WET (fresh frozen) or DRY (flower) cannabis
     wet_dry = models.CharField(max_length=3, null=True, blank=True)
     produce_category = models.CharField(max_length=250, null=True, blank=True)
@@ -412,11 +416,11 @@ class TT_Storage_Batch(models.Model):
     weight = models.FloatField(null=True, blank=True)
     # Status examples: in storage, sent to processor, converted to product batch, destroyed
     status = models.CharField(max_length=250, null=True, blank=True)
-    converted = models.BooleanField()
-    deleted = models.BooleanField()
+    converted = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
-    destroy_scheduled = models.BooleanField()
+    destroy_scheduled = models.BooleanField(default=False)
     destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
@@ -430,14 +434,25 @@ class TT_Storage_Batch(models.Model):
 
 class TT_Product_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product_name = models.CharField(max_length=250, null=True, blank=True)
+    product_category = models.CharField(max_length=250, null=True, blank=True)
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
     storage_batches = models.ManyToManyField(TT_Storage_Batch)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
+    # uom (Unit of Measurement) & total_quantity & total_weight will help link important info to model that can (1) inform inventory of the total_quantity & total_weight of incoming product units; (2) Lab_sample weights can subtract from this when created to keep amounts current.
+    uom = models.CharField(max_length=250, null=True, blank=True)
+    total_quantity = models.IntegerField(null=True, blank=True)
+    # Add weights of selected storage_batches to get this
+    total_weight = models.FloatField(null=True, blank=True)
+    remaining_quantity = models.IntegerField(null=True, blank=True)
+    remaining_weight = models.FloatField(null=True, blank=True)
+    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
+    available = models.BooleanField(default=False)
     # Select if product uses WET (fresh frozen) or DRY (flower) cannabis
     wet_dry = models.CharField(max_length=3, null=True, blank=True)
-    product_category = models.CharField(max_length=250, null=True, blank=True)
-    product_name = models.CharField(max_length=250, null=True, blank=True)
-    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
-    available = models.CharField(max_length=250, null=True, blank=True)
     packaging = models.CharField(max_length=250, null=True, blank=True)
     wholesale_price = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     msrp = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
@@ -453,13 +468,9 @@ class TT_Product_Batch(models.Model):
     use_by_date = models.DateField(null=True, blank=True)
     sku = models.CharField(max_length=250, null=True, blank=True)
     coa = models.URLField(null=True, blank=True)
+    tested = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True)
-    # Update cannabis amounts still on hand. 
-    # If TT_Product_Batch.wet_dry = "wet":
-    #     TT_Plant_Batch_Harvest.remaining_wet_weight = TT_Plant_Batch_Harvest.remaining_wet_weight - TT_Product_Batch.total_weight
-    # If TT_Product_Batch.wet_dry = "dry":
-    #     TT_Plant_Batch_Harvest.remaining_dry_weight = TT_Plant_Batch_Harvest.remaining_dry_weight - TT_Product_Batch.total_weight
-    total_weight = models.FloatField(null=True, blank=True)
+           
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
@@ -471,28 +482,16 @@ class TT_Product_Batch(models.Model):
 class TT_Inventory(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     inventory_name = models.CharField(max_length=250, null=True, blank=True)
-    product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
     inventory_type = models.CharField(max_length=250, null=True, blank=True)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
-    deleted = models.BooleanField()
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
+    deleted = models.BooleanField(default=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
     id_serial = models.IntegerField(null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
-    med_usable_weight = models.FloatField(null=True, blank=True)
-    medicated = models.BooleanField()
-    product_name = models.CharField(max_length=250, null=True, blank=True)
-    qa_status = models.CharField(max_length=250, null=True, blank=True)
-    rec_usable_weight = models.FloatField(null=True, blank=True)
-    remaining_amount = models.FloatField(null=True, blank=True)
-    seized = models.BooleanField()
-    session_time = models.IntegerField(null=True, blank=True)
-    status = models.CharField(max_length=250, null=True, blank=True)
-    strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
-    transaction_id = models.IntegerField(null=True, blank=True)
-    unit_based = models.BooleanField()
-    usable_weight = models.FloatField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -500,28 +499,62 @@ class TT_Inventory(models.Model):
         return reverse('tt_inventory_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.inventory_name} {self.uid}'
+        return f'{self.inventory_name}'
+
+class TT_Inventory_Product(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    inventory = models.ForeignKey(TT_Inventory, on_delete=models.CASCADE)
+    product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=250, null=True, blank=True)
+    deleted = models.BooleanField(default=False)
+    qa_status = models.CharField(max_length=250, null=True, blank=True)
+    total_quantity = models.IntegerField(null=True, blank=True)
+    remaining_quantity = models.IntegerField(null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=True)
+    remaining_amount = models.FloatField(null=True, blank=True)
+    unit_based = models.BooleanField(default=False)
+    usable_weight = models.FloatField(null=True, blank=True)
+    rec_usable_weight = models.FloatField(null=True, blank=True)
+    med_usable_weight = models.FloatField(null=True, blank=True)
+    medicated = models.BooleanField(default=False)
+    seized = models.BooleanField(default=False)
+    session_time = models.IntegerField(null=True, blank=True)
+    status = models.CharField(max_length=250, null=True, blank=True)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_inventory_product_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'{self.product_name} in {self.inventory.inventory_name}'
 
 
 class TT_Lab_Sample(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
-    active = models.BooleanField()
+    active = models.BooleanField(default=False)
+    location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    from_row = models.IntegerField(null=True, blank=True)
+    to_row = models.IntegerField(null=True, blank=True)
     # To update cannabis amounts/weight::
     # TT_Product_Batch.total_weight = TT_Product_Batch.total_weight - TT_Lab_Sample.amount
-    amount = models.FloatField(null=True, blank=True)
+    amount = models.FloatField(null=True, blank=True) # 'amount' = 'weight'
     amount_used = models.FloatField(null=True, blank=True)
-    deleted = models.BooleanField()
+    quantity = models.IntegerField(null=True, blank=True)
+    deleted = models.BooleanField(default=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     inventory_type = models.IntegerField(null=True, blank=True)
     lab_license = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
-    medical_grade = models.BooleanField()
+    medical_grade = models.BooleanField(default=False)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     result = models.CharField(max_length=250, null=True, blank=True)
     results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
-    rn_d = models.BooleanField()
+    rn_d = models.BooleanField(default=False)
     sample_use = models.CharField(max_length=250, null=True, blank=True)
     session_time = models.IntegerField(null=True, blank=True)
     test_results = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
@@ -549,7 +582,7 @@ class Manifest_Driver(models.Model):
 class Stop_Item(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     description = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
@@ -571,7 +604,7 @@ class Manifest_Stop(models.Model):
     approximate_arrival = models.CharField(max_length=250, null=True, blank=True)
     approximate_departure = models.CharField(max_length=250, null=True, blank=True)
     approximate_route = models.CharField(max_length=250, null=True, blank=True)
-    driver_arrived = models.BooleanField()
+    driver_arrived = models.BooleanField(default=False)
     driver_arrived_time = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
@@ -608,20 +641,20 @@ class Manifest_ThirdPartyTransporter(models.Model):
 class Manifest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     city = models.CharField(max_length=250, null=True, blank=True)
-    completed = models.BooleanField()
+    completed = models.BooleanField(default=False)
     completion_date = models.CharField(max_length=250, null=True, blank=True)
     created_on = models.CharField(max_length=250, null=True, blank=True)
-    deleted = models.BooleanField()
-    driver_arrived = models.BooleanField()
+    deleted = models.BooleanField(default=False)
+    driver_arrived = models.BooleanField(default=False)
     drivers = models.ForeignKey(Manifest_Driver, on_delete=models.CASCADE)
-    in_transit = models.BooleanField()
-    is_accepted = models.BooleanField()
-    is_parked = models.BooleanField()
+    in_transit = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
+    is_parked = models.BooleanField(default=False)
     license_number = models.CharField(max_length=250, null=True, blank=True)
     manifest_id = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250, null=True, blank=True)
     phone = models.CharField(max_length=250, null=True, blank=True)
-    received = models.BooleanField()
+    received = models.BooleanField(default=False)
     session_time = models.IntegerField(null=True, blank=True)
     state = models.CharField(max_length=250, null=True, blank=True)
     stop_count = models.IntegerField(null=True, blank=True)
