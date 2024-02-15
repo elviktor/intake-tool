@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.models import ModelForm
-from .models import TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory_Product, Stop_Item
+from .models import TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory_Product, Stop_Item, Invoice_Inventory
 
 
 class TTHarvestToStorageForm(ModelForm):
@@ -101,7 +101,7 @@ class TTInventoryToStopItemForm(ModelForm):
    
    def clean_sample_weight(self):
       weight = self.cleaned_data['weight']
-      total_weight = self.instance.TT_Product_Batch.remaining_weight
+      total_weight = self.instance.TT_Inventory_Product.remaining_weight
 
         # Ensure that product weight is not greater than total weight
       if weight > total_weight:
@@ -111,11 +111,31 @@ class TTInventoryToStopItemForm(ModelForm):
 
    def clean_sample_quantity(self):
       quantity = self.cleaned_data['quantity']
-      total_quantity = self.instance.TT_Product_Batch.remaining_quantity
+      total_quantity = self.instance.TT_Inventory_Product.remaining_quantity
 
       # Ensure that stop item quantity is not greater than total batch quantity
       if quantity > total_quantity:
           raise forms.ValidationError("Stop Item quantity cannot be greater than total product quantity.")
 
       return quantity
+   
+
+   class TTInventoryToInvoiceItemForm(ModelForm):
+      class Meta:
+         model = Invoice_Inventory
+         fields = '__all__'
+      
+      def __init__(self, *args, **kwargs):
+         super().__init__(*args, **kwargs)
+         self.fields['amount'].widget.attrs.update({'step': '0.01'})
+
+      def clean_sample_quantity(self):
+         quantity = self.cleaned_data['amount']
+         total_quantity = self.instance.TT_Inventory_Product.remaining_quantity
+
+         # Ensure that stop item quantity is not greater than total batch quantity
+         if quantity > total_quantity:
+            raise forms.ValidationError("Stop Item quantity cannot be greater than total product quantity.")
+
+         return quantity
    

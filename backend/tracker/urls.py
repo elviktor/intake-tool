@@ -29,6 +29,9 @@ urlpatterns = [
 
      path('forms/inventory_to_stop_item/', views.inventory_to_stop_item, name='tt_inventory_to_stop_item_form'),
 
+     path('forms/inventory_to_invoice_item/', views.inventory_to_invoice_item, name='tt_inventory_to_invoice_item_form'),
+
+
 
 # Create Update Delete Template URLs
 # ==================================

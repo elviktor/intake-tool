@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <title>{% block title %}Justice Seed{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     <!-- Bootstrap Css -->
     <link href="{% static 'css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
@@ -16,47 +17,248 @@
     <link href="{% static 'css/custom.css' %}" rel="stylesheet" type="text/css" />
 
 </head>
-<body>
+<body data-sidebar="dark">
+
     <!-- Begin page -->
     <div id="layout-wrapper">
-        <header>
-            <div class="navbar navbar-dark bg-dark">
-                <div class="navbar-text">
+
+        <header id="page-topbar">
+            <div class="navbar-header">
+                <div class="d-flex">
                     <!-- LOGO -->
-                    <a  class="p-2 display-4"href="{% url 'home' %}"> 
-                        Justice Seed
-                    </a>    
+                    <div class="navbar-brand-box">
+                        <a href="{% url 'home' %}" class="logo logo-dark">
+                            <span class="logo-sm">
+                                <img src="{% static 'img/logo-sm-dark.png' %}" alt="logo-sm-dark" height="32">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="{% static 'img/logo-dark.png' %}" alt="logo-dark" height="50">
+                            </span>
+                        </a>
+
+                        <a href="{% url 'home' %}" class="logo logo-light">
+                            <span class="logo-sm">
+                                <img src="{% static 'img/logo-sm-light.png' %}" alt="logo-sm-light" height="32">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="{% static 'img/logo-light.png' %}" alt="logo-light" height="50">
+                            </span>
+                        </a>
+                    </div>
+
+                    <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect"
+                        id="vertical-menu-btn">
+                        <i class="ri-menu-2-line align-middle"></i>
+                    </button>
+
+                    
                 </div>
-                <div class="p-2 text-dark font-weight-bold navbar-text">
-                    <a class="m-2" href="{% url 'about' %}">
-                        About
-                    </a>
-                
-                {% if user.is_authenticated %}
-                
-                    <a class="m-2" href="{% url 'account_logout' %}">
-                        Log Out
-                    </a>
-                
-                {% else %}
-                
-                    <a class="m-2" href="{% url 'account_login' %}">
-                        Log In
-                    </a>
-                    <a class="m-2" href="{% url 'account_signup' %}">
-                        Sign Up
-                    </a>
+
+                <div class="d-flex">
+
+                    <div class="dropdown d-none d-lg-inline-block ms-1">
+                        <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+                            <i class="ri-fullscreen-line"></i>
+                        </button>
+                    </div>
+
+                    <div class="dropdown d-inline-block user-dropdown">
+                        <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="d-none d-xl-inline-block ms-1">{{ user.email }}</span>
+                            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- item-->
+                            <a class="dropdown-item" href="#"><i class="ri-user-line align-middle me-1"></i> Profile</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#"><i
+                                    class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>
+                        </div>
+                    </div>
+
+                    
+
                 </div>
-                {% endif %}
             </div>
         </header>
+
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="vertical-menu">
+
+            <div data-simplebar class="h-100">
+
+                <!--- Sidemenu -->
+                <div id="sidebar-menu">
+                    <!-- Left Menu Start -->
+                    <ul class="metismenu list-unstyled" id="side-menu">
+                        
+                        <li class="menu-title">System Setup</li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Locations</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'tt_location_create' %}">Create</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-profile-line"></i>
+                                <span>Sublots</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_sublot_create' %}">Create</a></li>
+                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Genetics</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'strain_create' %}">Create</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+
+                        <li class="menu-title">Track and Trace</li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Plants</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'tt_plant_batch_create' %}">Create Batch</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-profile-line"></i>
+                                <span>Harvests</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_plant_batch_harvest_create' %}">Create Batch</a></li>
+                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Storage</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'tt_harvest_to_storage_form' %}">Create Batch</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-profile-line"></i>
+                                <span>Products</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_storage_to_product_form' %}">Create Batch</a></li>
+                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Lab Samples</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'lab_result_create' %}">Store Lab Result</a></li>
+                                <li><a target="_self" href="{% url 'lab_sample_result_create' %}">Store Lab Sample Result</a></li>
+                                <li><a target="_self" href="{% url 'tt_product_to_lab_sample_form' %}">Store Lab Sample Set</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-profile-line"></i>
+                                <span>Inventory</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_inventory_create' %}">Create Inventory</a></li>
+                                <li><a href="{% url 'tt_product_to_inventory_form' %}">Add Product</a></li>
+                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-profile-line"></i>
+                                <span>Invoices</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="pages-starter.html">Create</a></li>
+                                <li><a href="pages-starter.html">Add Product</a></li>
+                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>Transport Manifests</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'manifest_driver_create' %}">Register Driver</a></li>
+                                <li><a target="_self" href="{% url 'manifest_vehicle_create' %}">Register Vehicle</a></li>
+                                <li><a target="_self" href="{% url 'manifest_thirdpartytransporter_create' %}">Third Party Transporter</a></li>
+                                <li><a target="_self" href="{% url 'manifest_thirdpartytransporter_create' %}">Create Manifest Stop</a></li>
+                                <li><a href="{% url 'tt_inventory_to_stop_item_form' %}">Add Stop Item</a></li>
+                                <li><a target="_self" href="{% url 'manifest_stop_create' %}">Create Manifest</a></li>
+                                <li><a target="_self" href="auth-register.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        
+
+                        <li class="menu-title">Reporting</li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ri-account-circle-line"></i>
+                                <span>OCM Monthly Report</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="auth-login.html">View</a></li>
+                            </ul>
+                        </li>
+
+                        
+
+                    </ul>
+                </div>
+                <!-- Sidebar -->
+            </div>
+        </div>
+        <!-- Left Sidebar End -->
+
+
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
-        <div class="container p-3 my-3">
-          {% block content %}
-          {% endblock content %}
+        <div class="container p-4 mt-5">
+            {% block content %}
+            {% endblock content %}
         </div>
         <!-- end main content-->
 
@@ -72,6 +274,7 @@
 
     </div>
     <!-- END layout-wrapper -->
+
 
     <!-- JAVASCRIPT -->
     <script src="{% static 'libs/jquery/jquery.min.js' %}"></script>

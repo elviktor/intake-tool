@@ -16,7 +16,7 @@
 			"path": "../../../WEBTEMPLATE_Nazox_Ajax_v1.1.0"
 		},
 		{
-			"path": "../../../../namer"
+			"path": "../../../frontend-tester"
 		}
 	],
 	"settings": {}

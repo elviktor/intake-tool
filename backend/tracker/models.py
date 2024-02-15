@@ -241,37 +241,7 @@ class Plant_Cure(models.Model):
     def __str__(self):
         return self.cure_id
 
-
-class Invoice_Inventory(models.Model):
-    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    amount = models.FloatField(null=True, blank=True)
-    deleted = models.BooleanField(default=False)
-    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
-    inventory_id = models.CharField(max_length=250, null=True, blank=True)
-    invoice_id = models.CharField(max_length=250, null=True, blank=True)
-    price = models.FloatField(null=True, blank=True)
-    transaction_id = models.IntegerField(null=True, blank=True) 
-    uom = models.CharField(max_length=250, null=True, blank=True)
-
-    def __str__(self):
-        return self.inventory_id
-
-class Invoice_Model(models.Model):
-    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    accepted = models.BooleanField(default=False)
-    buyer_location_license = models.CharField(max_length=250, null=True, blank=True)
-    deleted = models.BooleanField(default=False)
-    inventory = models.ForeignKey(Invoice_Inventory, on_delete=models.CASCADE)
-    invoice_id = models.CharField(max_length=250, null=True, blank=True)
-    location_license = models.CharField(max_length=250, null=True, blank=True)
-    refund_invoice_id = models.CharField(max_length=250, null=True, blank=True)
-    refunded = models.BooleanField(default=False)
-    session_time = models.IntegerField(null=True, blank=True) 
-    transaction_id = models.IntegerField(null=True, blank=True) 
-
-    def __str__(self):
-        return self.invoice_id
-
+# Inventory moved down to TT section
 
 class Grow_Room(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -529,6 +499,47 @@ class TT_Inventory_Product(models.Model):
 
     def __str__(self):
         return f'{self.product_name} in {self.inventory.inventory_name}'
+
+
+# TO DO I need to switch the relationship between
+# Invoice_Model & Invoice_Inventory.
+# I can use the same approach as for adding
+# Product batches to TT_Inventory::
+# TT_Inventory.amount = TT_Inventory.amount - Invoice_Inventory.amount(?)
+class Invoice_Model(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    accepted = models.BooleanField(default=False)
+    buyer_location_license = models.CharField(max_length=250, null=True, blank=True)
+    deleted = models.BooleanField(default=False)
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    invoice_id = models.CharField(max_length=250, null=True, blank=True)
+    location_license = models.CharField(max_length=250, null=True, blank=True)
+    refund_invoice_id = models.CharField(max_length=250, null=True, blank=True)
+    refunded = models.BooleanField(default=False)
+    session_time = models.IntegerField(null=True, blank=True) 
+    transaction_id = models.IntegerField(null=True, blank=True) 
+
+    def __str__(self):
+        return self.invoice_id
+
+# This name comes from Bio Track API
+# I would call this model Invoice_Item
+class Invoice_Inventory(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    inventory_product = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=250, null=True, blank=True)
+    amount = models.FloatField(null=True, blank=True) # Quantity
+    price = models.FloatField(null=True, blank=True)
+    deleted = models.BooleanField(default=False)
+    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
+    inventory_id = models.CharField(max_length=250, null=True, blank=True)
+    invoice_id = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    transaction_id = models.IntegerField(null=True, blank=True) 
+    uom = models.CharField(max_length=250, null=True, blank=True)
+      
+    def __str__(self):
+        return self.inventory_id
 
 
 class TT_Lab_Sample(models.Model):

@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .forms import TTHarvestToStorageForm, TTStorageToProductForm, TTProductToLabSampleForm, TTProductToInventoryForm, TTInventoryToStopItemForm
+from .forms import TTHarvestToStorageForm, TTStorageToProductForm, TTProductToLabSampleForm, TTProductToInventoryForm, TTInventoryToStopItemForm, TTInventoryToInvoiceItemForm
 from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
 
 # Contents
@@ -148,17 +148,43 @@ def inventory_to_stop_item(request):
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             quantity = form.cleaned_data['quantity']
-            product_batch = form.cleaned_data['product_batch']
+            inventory_product = form.cleaned_data['inventory_product']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot'] 
 
-            # Create a new Product instance and associate it with the inventory
-            inventory_batch = TT_Inventory.objects.create(product_batch=product_batch,location=location, sublot=sublot, weight=weight, quantity=quantity, received_quantity=quantity)
+            # Create a new Stop Item instance and associate it with the inventory
+            stop_item = Stop_Item.objects.create(inventory_product=inventory_product,location=location, sublot=sublot, weight=weight, quantity=quantity, received_quantity=quantity)
 
             # Update the product batch amount (weight) and quantity
-            product_batch.remaining_weight -= weight
-            product_batch.remaining_quantity -= quantity
-            product_batch.save()
+            inventory_product.remaining_weight -= weight
+            inventory_product.remaining_quantity -= quantity
+            inventory_product.save()
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        form = TTInventoryToStopItemForm
+        #return redirect('about')
+
+    return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
+
+
+def inventory_to_invoice_item(request):
+    
+    if request.method == 'POST':
+        form = TTInventoryToInvoiceItemForm(request.POST)
+        if form.is_valid():
+            quantity = form.cleaned_data['amount']
+            inventory_product = form.cleaned_data['inventory_product']
+            invoice = form.cleaned_date['invoice']
+            
+            # Create a new Stop Item instance and associate it with the inventory
+            invoice_item = Invoice_Inventory.objects.create(inventory_product=inventory_product,invoice=invoice, amount=quantity)
+
+            # Update the product batch amount (weight) and quantity
+            inventory_product.remaining_quantity -= quantity
+            inventory_product.save()
             form.save()
             
             return redirect('home')
