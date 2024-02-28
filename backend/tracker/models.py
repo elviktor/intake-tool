@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.db import models
 import uuid
+from accounts.models import CustomUser
 from django.utils.crypto import get_random_string
 
 class Book(models.Model):
@@ -24,6 +25,7 @@ class Book(models.Model):
 
 class Strain(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=250, null=True, blank=True)
     shortname = models.CharField(max_length=250, null=True, blank=True)
     source = models.CharField(max_length=250, null=True, blank=True)
@@ -301,6 +303,7 @@ class TT_Sublot(models.Model):
 
 class TT_Plant_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     birth_date = models.DateField(null=True, blank=True)
     strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True) #Use qty to bulk_create() Biotrack plant models
@@ -335,6 +338,7 @@ class TT_Plant_Batch(models.Model):
 
 class TT_Plant_Batch_Harvest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
     plant_batch = models.ForeignKey(TT_Plant_Batch, on_delete=models.CASCADE)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
@@ -368,7 +372,8 @@ class TT_Plant_Batch_Harvest(models.Model):
 
 class TT_Storage_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE, limit_choices_to={'user':models.F('user')})
     package_number = models.IntegerField(null=True, blank=True)
     location_date = models.DateField(null=True, blank=True)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
@@ -501,11 +506,9 @@ class TT_Inventory_Product(models.Model):
         return f'{self.product_name} in {self.inventory.inventory_name}'
 
 
-# TO DO I need to switch the relationship between
-# Invoice_Model & Invoice_Inventory.
 # I can use the same approach as for adding
 # Product batches to TT_Inventory::
-# TT_Inventory.amount = TT_Inventory.amount - Invoice_Inventory.amount(?)
+# TT_Inventory.amount = TT_Inventory.amount - Invoice_Inventory.amount
 class Invoice_Model(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     accepted = models.BooleanField(default=False)
@@ -519,6 +522,10 @@ class Invoice_Model(models.Model):
     session_time = models.IntegerField(null=True, blank=True) 
     transaction_id = models.IntegerField(null=True, blank=True) 
 
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('invoice_model_detail', args=[str(self.uid)])
+
     def __str__(self):
         return self.invoice_id
 
@@ -526,7 +533,7 @@ class Invoice_Model(models.Model):
 # I would call this model Invoice_Item
 class Invoice_Inventory(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    invoice_model = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
     inventory_product = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=250, null=True, blank=True)
     amount = models.FloatField(null=True, blank=True) # Quantity
@@ -534,12 +541,12 @@ class Invoice_Inventory(models.Model):
     deleted = models.BooleanField(default=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
-    invoice_id = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    invoice_id = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True) 
     uom = models.CharField(max_length=250, null=True, blank=True)
       
     def __str__(self):
-        return self.inventory_id
+        return self.inventory_product
 
 
 class TT_Lab_Sample(models.Model):
@@ -681,3 +688,18 @@ class Manifest(models.Model):
 
     def __str__(self):
         return self.manifest_id
+    
+
+    # Delete Tracking Models
+class TT_Plant_Batch_Harvest_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_plant_batch_harvest_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'

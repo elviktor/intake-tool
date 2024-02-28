@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.views import generic
+from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .forms import TTHarvestToStorageForm, TTStorageToProductForm, TTProductToLabSampleForm, TTProductToInventoryForm, TTInventoryToStopItemForm, TTInventoryToInvoiceItemForm
-from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room
+from . import forms
+from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Plant_Batch_Harvest_Delete
 
 # Contents
 # ========
@@ -24,7 +24,7 @@ def harvest_to_storage(request):
     #harvest_batch = TT_Plant_Batch_Harvest.objects.get(uid=pk)
 
     if request.method == 'POST':
-        form = TTHarvestToStorageForm(request.POST)
+        form = forms.TTHarvestToStorageForm(request.POST)
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             wet_dry = form.cleaned_data['wet_dry']
@@ -49,14 +49,14 @@ def harvest_to_storage(request):
             
             return redirect('home')
     else:
-        form = TTHarvestToStorageForm
+        form = forms.TTHarvestToStorageForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_harvest_to_storage_form.html', {'form': form})
 
 def storage_to_product(request):
     if request.method == 'POST':
-        form = TTStorageToProductForm(request.POST)
+        form = forms.TTStorageToProductForm(request.POST)
         if form.is_valid():
             wet_dry = form.cleaned_data['wet_dry']
             storage_batches = form.cleaned_data['storage_batches']
@@ -77,7 +77,7 @@ def storage_to_product(request):
 
             return redirect('home')
     else:
-        form = TTStorageToProductForm
+        form = forms.TTStorageToProductForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_storage_to_product_form.html', {'form': form})
@@ -86,7 +86,7 @@ def storage_to_product(request):
 def product_to_lab_sample(request):
     
     if request.method == 'POST':
-        form = TTProductToLabSampleForm(request.POST)
+        form = forms.TTProductToLabSampleForm(request.POST)
         if form.is_valid():
             amount = form.cleaned_data['amount'] 
             quantity = form.cleaned_data['quantity']
@@ -106,7 +106,7 @@ def product_to_lab_sample(request):
             return redirect('home')
     
     else:
-        form = TTProductToLabSampleForm
+        form = forms.TTProductToLabSampleForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_product_to_lab_sample_form.html', {'form': form})
@@ -115,7 +115,7 @@ def product_to_lab_sample(request):
 def product_to_inventory(request):
     
     if request.method == 'POST':
-        form = TTProductToInventoryForm(request.POST)
+        form = forms.TTProductToInventoryForm(request.POST)
         if form.is_valid():
             total_amount = form.cleaned_data['total_amount'] 
             total_quantity = form.cleaned_data['total_quantity']
@@ -135,7 +135,7 @@ def product_to_inventory(request):
             return redirect('home')
     
     else:
-        form = TTProductToInventoryForm
+        form = forms.TTProductToInventoryForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_product_to_inventory_form.html', {'form': form})
@@ -144,7 +144,7 @@ def product_to_inventory(request):
 def inventory_to_stop_item(request):
     
     if request.method == 'POST':
-        form = TTInventoryToStopItemForm(request.POST)
+        form = forms.TTInventoryToStopItemForm(request.POST)
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             quantity = form.cleaned_data['quantity']
@@ -164,7 +164,7 @@ def inventory_to_stop_item(request):
             return redirect('home')
     
     else:
-        form = TTInventoryToStopItemForm
+        form = forms.TTInventoryToStopItemForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
@@ -173,7 +173,7 @@ def inventory_to_stop_item(request):
 def inventory_to_invoice_item(request):
     
     if request.method == 'POST':
-        form = TTInventoryToInvoiceItemForm(request.POST)
+        form = forms.TTInventoryToInvoiceItemForm(request.POST)
         if form.is_valid():
             quantity = form.cleaned_data['amount']
             inventory_product = form.cleaned_data['inventory_product']
@@ -190,10 +190,104 @@ def inventory_to_invoice_item(request):
             return redirect('home')
     
     else:
-        form = TTInventoryToStopItemForm
+        form = forms.TTInventoryToInvoiceItemForm
         #return redirect('about')
 
     return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
+
+
+def tt_plant_batch_harvest_create_form(request):
+    
+    if request.method == 'POST':
+
+        plant_batch = None
+        user = request.user
+
+        form = forms.TTPlantBatchHarvestCreateForm(request.POST,user=user)
+        formset = forms.TTPlantBatchHarvestCreateFormset(instance=plant_batch, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            plant_batch = form.cleaned_data['plant_batch']
+            location = form.cleaned_data['location']
+            sublot = form.cleaned_data['sublot']
+            total_dry_weight = form.cleaned_data['total_dry_weight']
+            total_wet_weight = form.cleaned_data['total_wet_weight']
+
+            form = forms.TTPlantBatchHarvestCreateForm(request.POST, instance=plant_batch, user=user)
+            formset = forms.TTPlantBatchHarvestCreateFormset(request.POST, instance=plant_batch, form_kwargs={'user': request.user})
+            
+            # Create a new Model instance and associate it with the batch
+            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, plant_batch=plant_batch, location=location, sublot=sublot, total_wet_weight=total_wet_weight,total_dry_weight=total_dry_weight,remaining_wet_weight=total_wet_weight, remaining_dry_weight=total_dry_weight)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        plant_batch = None
+        user = request.user
+
+        #form = forms.TTPlantBatchHarvestCreateForm
+
+        form = forms.TTPlantBatchHarvestCreateForm(user=user)
+        formset = forms.TTPlantBatchHarvestCreateFormset(instance=plant_batch, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_plant_batch_harvest_create_form.html', {'form': form})
+
+
+# Toggle Delete Views
+# ===================
+
+def tt_plant_batch_harvest_delete_form(request):
+    #harvest_batch = TT_Plant_Batch_Harvest.objects.get(uid=pk)
+
+    if request.method == 'POST':
+        form = forms.TTPlantBatchHarvestDeleteForm(request.POST)
+        if form.is_valid():
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Plant_Batch_Harvest_Delete.objects.create(deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        form = forms.TTPlantBatchHarvestDeleteForm
+        #return redirect('about')
+
+    return render(request, 'tracker/tt_plant_batch_harvest_delete_form.html', {'form': form})
+
+
+# Filter & Search Views
+# =====================
+
+class TTPlantBatchHarvestSearch(View):
+    template_name = 'tracker/tt_plant_batch_harvest_search.html'
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q')
+
+        if query:
+            results = TT_Plant_Batch_Harvest.objects.filter(plant_batch__strain__name__icontains=query)
+            # change the filter to a char field input
+        else:
+            results = TT_Plant_Batch_Harvest.objects.all()
+
+        context = {'results': results, 'query': query}
+        return render(request, self.template_name, context)
+
 
 
 # Create Update Delete Template Views
@@ -266,16 +360,27 @@ class TTPlantBatchDelete(LoginRequiredMixin,DeleteView):
 
 class TTPlantBatchHarvestCreate(LoginRequiredMixin,CreateView):
     model = TT_Plant_Batch_Harvest
-    fields = '__all__'
+    fields = ['deleted','plant_batch','location','sublot','from_row','to_row','harvest_stage','harvest_completed','harvest_start_date','harvest_finish_date','external_id','harvest_id','biotrack_id','transaction_id','total_wet_weight','total_dry_weight','remaining_wet_weight','remaining_dry_weight','notes']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class TTPlantBatchHarvestUpdate(LoginRequiredMixin,UpdateView):
     model = TT_Plant_Batch_Harvest
-    fields = '__all__'
+    fields = ['deleted','plant_batch','location','sublot','from_row','to_row','harvest_stage','harvest_completed','harvest_start_date','harvest_finish_date','external_id','harvest_id','biotrack_id','transaction_id','total_wet_weight','total_dry_weight','remaining_wet_weight','remaining_dry_weight','notes']
     success_url = reverse_lazy('home')
+
+    def get_queryset(self):
+        user = self.request.user
+        return TT_Plant_Batch_Harvest.objects.filter(user=user)
 
 class TTPlantBatchHarvestDelete(LoginRequiredMixin,DeleteView):
     model = TT_Plant_Batch_Harvest
     success_url = reverse_lazy('home')
+
+    def get_queryset(self):
+        return TT_Plant_Batch_Harvest.objects.filter(user=self.request.user)
 
 class TTStorageBatchCreate(LoginRequiredMixin,CreateView):
     model = TT_Storage_Batch
@@ -605,7 +710,7 @@ class GrowRoomDelete(LoginRequiredMixin,DeleteView):
 
 # Archive vvvvvvvvvvvvvvvvv
 class TTStorageBatchCreateView(LoginRequiredMixin,CreateView):
-    form_class = TTHarvestToStorageForm
+    form_class = forms.TTHarvestToStorageForm
     template_name = 'tracker/tt_harvest_to_storage_form.html'
     success_url = "home"
 
@@ -643,6 +748,9 @@ class TTPlantBatchDetailView(LoginRequiredMixin,generic.DetailView):
 class TTPlantBatchHarvestDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""
     model = TT_Plant_Batch_Harvest
+
+    def get_queryset(self):
+        return TT_Plant_Batch_Harvest.objects.filter(user=self.request.user)
 
 class TTStorageBatchDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""

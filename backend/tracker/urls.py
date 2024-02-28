@@ -31,6 +31,18 @@ urlpatterns = [
 
      path('forms/inventory_to_invoice_item/', views.inventory_to_invoice_item, name='tt_inventory_to_invoice_item_form'),
 
+     path('forms/tt_plant_batch_harvest_create_form/', views.tt_plant_batch_harvest_create_form, name='tt_plant_batch_harvest_create_form'),
+
+# Toggle Delete Form URLs
+# ==================================
+     path('forms/tt_plant_batch_harvest_delete_form/', views.tt_plant_batch_harvest_delete_form, name='tt_plant_batch_harvest_delete_form'),
+
+
+# Search URLs
+#==============
+
+     path('tt_plant_batch_harvest/search/', views.TTPlantBatchHarvestSearch.as_view(), name='tt_plant_batch_harvest_search'),
+
 
 
 # Create Update Delete Template URLs
