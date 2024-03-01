@@ -459,7 +459,7 @@ class TT_Storage_Batch(models.Model):
         return reverse('tt_storage_batch_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.produce_category} {str(self.package_number)}'
+        return f'{self.harvest_batch} {self.wet_dry} {str(self.package_number)}'
 
 
 class TT_Product_Batch(models.Model):
@@ -767,6 +767,67 @@ class Manifest(models.Model):
 
     # Delete Tracking Models
     # ======================
+
+class TT_Location_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_location_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class TT_Sublot_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_sublot_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Strain_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Strain, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('strain_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class TT_Plant_Batch_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Plant_Batch, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_plant_batch_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
 class TT_Plant_Batch_Harvest_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -777,6 +838,141 @@ class TT_Plant_Batch_Harvest_Delete(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
         return reverse('tt_plant_batch_harvest_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}' 
+    
+
+class TT_Storage_Batch_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Storage_Batch, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_storage_batch_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class TT_Product_Batch_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_product_batch_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class Lab_Result_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('lab_result_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class Lab_Sample_Result_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('lab_sample_result_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class TT_Lab_Sample_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Lab_Sample, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_lab_sample_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class TT_Inventory_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Inventory, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_sublot_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class TT_Inventory_Product_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('tt_inventory_product_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class Invoice_Model_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('invoice_model_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class Invoice_Inventory_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateTimeField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Invoice_Inventory, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('invoice_inventory_delete_detail', args=[str(self.uid)])
 
     def __str__(self):
         return f'Delete Record - {self.deleted_item} {self.uid}'

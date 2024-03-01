@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import ModelForm
 from django.forms import inlineformset_factory
-from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest,TT_Plant_Batch_Harvest_Delete, Lab_Sample_Result, Lab_Result
+from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete
 
 
 class TTHarvestToStorageForm(ModelForm):
@@ -395,16 +395,352 @@ InvoiceModelCreateFormsetA = inlineformset_factory(
 # Delete Forms
 # ===================================
 
-class TTPlantBatchHarvestDeleteForm(ModelForm):
+class TTLocationDeleteForm(ModelForm):
       class Meta:
-         model = TT_Plant_Batch_Harvest_Delete
-         exclude = ["delete_time"]
+         model = TT_Location_Delete
+         fields = ['deleted_item','notes']
       
-      def check_deleted(self):
-         deleted = self.instance.TT_Plant_Batch_Harvest.deleted
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Location.objects.filter(user=self.user)
 
-         # Ensure that selected item has not already been deleted quantity is not greater than total batch quantity
+      def check_deleted(self):
+         deleted = self.instance.TT_Location.deleted
+
+         # Ensure that selected item has not already been deleted
          if deleted == True:
             raise forms.ValidationError("Item already deleted.")
 
          else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Location.objects.all(), empty_label="Select a batch to delete...")
+
+TTLocationDeleteFormsetA = inlineformset_factory(
+    TT_Location, TT_Location_Delete, form=TTLocationDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTSublotDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Sublot_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Sublot.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Sublot.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Sublot.objects.all(), empty_label="Select a batch to delete...")
+
+TTSublotDeleteFormsetA = inlineformset_factory(
+    TT_Sublot, TT_Sublot_Delete, form=TTSublotDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class StrainDeleteForm(ModelForm):
+      class Meta:
+         model = Strain_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Strain.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Strain.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Strain.objects.all(), empty_label="Select a batch to delete...")
+
+StrainDeleteFormsetA = inlineformset_factory(
+    Strain, Strain_Delete, form=StrainDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTPlantBatchDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Plant_Batch_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Plant_Batch.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Plant_Batch.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Plant_Batch.objects.all(), empty_label="Select a batch to delete...")
+
+TTPlantBatchDeleteFormsetA = inlineformset_factory(
+    TT_Plant_Batch, TT_Plant_Batch_Delete, form=TTPlantBatchDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+class TTPlantBatchHarvestDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Plant_Batch_Harvest_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Plant_Batch_Harvest.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Plant_Batch_Harvest.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Plant_Batch_Harvest.objects.all(), empty_label="Select a batch to delete...")
+
+TTPlantBatchHarvestDeleteFormsetA = inlineformset_factory(
+    TT_Plant_Batch_Harvest, TT_Plant_Batch_Harvest_Delete, form=TTPlantBatchHarvestDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTStorageBatchDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Storage_Batch_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Storage_Batch.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Storage_Batch.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Storage_Batch.objects.all(), empty_label="Select a batch to delete...")
+
+TTStorageBatchDeleteFormsetA = inlineformset_factory(
+    TT_Storage_Batch, TT_Storage_Batch_Delete, form=TTStorageBatchDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTProductBatchDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Product_Batch_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Product_Batch.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Product_Batch.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Product_Batch.objects.all(), empty_label="Select a batch to delete...")
+
+TTProductBatchDeleteFormsetA = inlineformset_factory(
+    TT_Product_Batch, TT_Product_Batch_Delete, form=TTProductBatchDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class LabResultDeleteForm(ModelForm):
+      class Meta:
+         model = Lab_Result_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Lab_Result.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Lab_Result.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Lab_Result.objects.all(), empty_label="Select a batch to delete...")
+
+LabResultDeleteFormsetA = inlineformset_factory(
+    Lab_Result, Lab_Result_Delete, form=LabResultDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class LabSampleResultDeleteForm(ModelForm):
+      class Meta:
+         model = Lab_Sample_Result_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Lab_Sample_Result.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Lab_Sample_Result.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Lab_Sample_Result.objects.all(), empty_label="Select a batch to delete...")
+
+LabSampleResultDeleteFormsetA = inlineformset_factory(
+    Lab_Sample_Result, Lab_Sample_Result_Delete, form=LabSampleResultDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTLabSampleDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Lab_Sample_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Lab_Sample.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Lab_Sample.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Lab_Sample.objects.all(), empty_label="Select a batch to delete...")
+
+TTLabSampleDeleteFormsetA = inlineformset_factory(
+    TT_Lab_Sample, TT_Lab_Sample_Delete, form=TTLabSampleDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTInventoryDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Inventory_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Inventory.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Inventory.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Inventory.objects.all(), empty_label="Select a batch to delete...")
+
+TTInventoryDeleteFormsetA = inlineformset_factory(
+    TT_Inventory, TT_Inventory_Delete, form=TTInventoryDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class TTInventoryProductDeleteForm(ModelForm):
+      class Meta:
+         model = TT_Inventory_Product_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = TT_Inventory_Product.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.TT_Inventory_Product.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=TT_Inventory_Product.objects.all(), empty_label="Select a batch to delete...")
+
+TTInventoryProductDeleteFormsetA = inlineformset_factory(
+    TT_Inventory_Product, TT_Inventory_Product_Delete, form=TTInventoryProductDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class InvoiceModelDeleteForm(ModelForm):
+      class Meta:
+         model = Invoice_Model_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Invoice_Model.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Invoice_Model.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Invoice_Model.objects.all(), empty_label="Select a batch to delete...")
+
+InvoiceModelDeleteFormsetA = inlineformset_factory(
+    Invoice_Model, Invoice_Model_Delete, form=InvoiceModelDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class InvoiceInventoryDeleteForm(ModelForm):
+      class Meta:
+         model = Invoice_Inventory_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Invoice_Inventory.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Invoice_Inventory.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Invoice_Inventory.objects.all(), empty_label="Select a batch to delete...")
+
+InvoiceInventoryDeleteFormsetA = inlineformset_factory(
+    Invoice_Inventory, Invoice_Inventory_Delete, form=InvoiceInventoryDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+

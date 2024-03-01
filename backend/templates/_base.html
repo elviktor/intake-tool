@@ -72,7 +72,7 @@
                             <!-- item-->
                             <a class="dropdown-item" href="#"><i class="ri-user-line align-middle me-1"></i> Profile</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i
+                            <a class="dropdown-item text-danger" href="{% url 'account_logout' %}"><i
                                     class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                 </div>
             </div>
         </header>
-
+        {% if user.is_authenticated %}
         <!-- ========== Left Sidebar Start ========== -->
         <div class="vertical-menu">
 
@@ -97,34 +97,37 @@
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-house-add"></i>
+
                                 <span>Locations</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_location_create_form' %}">Create</a></li>
-                                <li><a href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_location_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-profile-line"></i>
+                                <i class="bi bi-house-add"></i>
+
                                 <span>Sublots</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_sublot_create_form' %}">Create</a></li>
-                                <li><a href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'tt_sublot_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-sun"></i>
+
                                 <span>Genetics</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'strain_create_form' %}">Create</a></li>
-                                <li><a href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'strain_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
@@ -133,82 +136,89 @@
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-flower3"></i>
+
                                 <span>Plants</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_plant_batch_create_form' %}">Create Batch</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_plant_batch_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-profile-line"></i>
+                                <i class="bi bi-tree"></i>
+
                                 <span>Harvests</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_plant_batch_harvest_create_form' %}">Create Batch</a></li>
-                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'tt_plant_batch_harvest_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-bag-plus"></i>
+
                                 <span>Storage</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_harvest_to_storage_form' %}">Create Batch</a></li>
-                                <li><a href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_storage_batch_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-profile-line"></i>
+                                <i class="bi bi-gift"></i>
+
                                 <span>Products</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_storage_to_product_form' %}">Create Batch</a></li>
-                                <li><a href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'tt_product_batch_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-file-earmark-medical"></i>
+
                                 <span>Lab Samples</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a target="_self" href="{% url 'lab_result_create_form' %}">Store Lab Result</a></li>
                                 <li><a target="_self" href="{% url 'lab_sample_result_create_form' %}">Store Lab Sample Result</a></li>
                                 <li><a target="_self" href="{% url 'tt_product_to_lab_sample_form' %}">Store Lab Sample Set</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_lab_sample_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-profile-line"></i>
+                                <i class="bi bi-shop-window"></i>
+
                                 <span>Inventory</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_inventory_create_form' %}">Create Inventory</a></li>
                                 <li><a href="{% url 'tt_product_to_inventory_form' %}">Add Product</a></li>
-                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'tt_inventory_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-profile-line"></i>
+                                <i class="bi bi-file-ruled"></i>
+
                                 <span>Invoices</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'invoice_model_create_form' %}">Create</a></li>
                                 <li><a href="{% url 'tt_inventory_to_invoice_item_form' %}">Add Product</a></li>
-                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'invoice_model_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>                    
 
@@ -216,11 +226,12 @@
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
+                                <i class="bi bi-file-bar-graph"></i>
+
                                 <span>OCM Monthly Report</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="auth-login.html">View</a></li>
+                                <li><a href="{% url 'home' %}">View</a></li>
                             </ul>
                         </li>
 
@@ -232,7 +243,7 @@
             </div>
         </div>
         <!-- Left Sidebar End -->
-
+        {% endif %}
 
 
         <!-- ============================================================== -->

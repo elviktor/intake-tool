@@ -6,7 +6,7 @@ from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from . import forms
-from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Plant_Batch_Harvest_Delete
+from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete
 
 # Contents
 # ========
@@ -40,6 +40,7 @@ def harvest_to_storage(request):
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             wet_dry = form.cleaned_data['wet_dry']
+            package_number = form.cleaned_data['package_number']
             harvest_batch = form.cleaned_data['harvest_batch']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot'] 
@@ -50,7 +51,7 @@ def harvest_to_storage(request):
             formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location=location, sublot=sublot, weight=weight)
+            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location=location, sublot=sublot, weight=weight, package_number=package_number, wet_dry=wet_dry)
 
             if wet_dry == "wet":
                 # Update the harvest batch weight
@@ -114,7 +115,7 @@ def storage_to_product(request):
             formset_d = forms.TTStorageToProductFormsetD(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new instance
-            product_batch = TT_Product_Batch.objects.create( product_name=product_name, harvest_batch=harvest_batch, storage_batches=storage_batches, location=location, sublot=sublot, total_weight=total_weight, remaining_weight=total_weight, total_quantity=total_quantity, remaining_quantity=total_quantity,  wet_dry=wet_dry)
+            product_batch = TT_Product_Batch.objects.create( user=request.user, product_name=product_name, harvest_batch=harvest_batch, storage_batches=storage_batches, location=location, sublot=sublot, total_weight=total_weight, remaining_weight=total_weight, total_quantity=total_quantity, remaining_quantity=total_quantity,  wet_dry=wet_dry)
             
             form.save()
 
@@ -173,7 +174,7 @@ def product_to_lab_sample(request):
             formset_e = forms.TTProductToLabSampleFormsetE(instance=test_results, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            lab_sample_batch = TT_Lab_Sample.objects.create(sample_name=sample_name, product_batch=product_batch, location=location, sublot=sublot, amount=amount, quantity=quantity, results=results, test_results=test_results)
+            lab_sample_batch = TT_Lab_Sample.objects.create(user=request.user,sample_name=sample_name, product_batch=product_batch, location=location, sublot=sublot, amount=amount, quantity=quantity, results=results, test_results=test_results)
 
             # Update the product batch amount (weight) and quantity
             product_batch.remaining_weight -= amount
@@ -217,16 +218,14 @@ def product_to_inventory(request):
             total_amount = form.cleaned_data['total_amount'] 
             total_quantity = form.cleaned_data['total_quantity']
             product_batch = form.cleaned_data['product_batch']
-            location = form.cleaned_data['location']
             inventory = form.cleaned_data['inventory']
-            sublot = form.cleaned_data['sublot'] 
-
+            
             form = forms.TTProductToInventoryForm(request.POST, instance=user, user=user)
             formset_a = forms.TTProductToInventoryFormsetA(instance=inventory, form_kwargs={'user': request.user})
             formset_b = forms.TTProductToInventoryFormsetB(instance=product_batch, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            inventory_batch = TT_Inventory_Product.objects.create(inventory=inventory, product_batch=product_batch,location=location, sublot=sublot, total_amount=total_amount, remaining_amount=total_amount, total_quantity=total_quantity, remaining_quantity=total_quantity)
+            inventory_batch = TT_Inventory_Product.objects.create(user=request.user,inventory=inventory, product_batch=product_batch, total_amount=total_amount, remaining_amount=total_amount, total_quantity=total_quantity, remaining_quantity=total_quantity)
 
             # Update the product batch amount (weight) and quantity
             product_batch.remaining_weight -= total_amount
@@ -268,7 +267,7 @@ def inventory_to_stop_item(request):
 
 
             # Create a new Stop Item instance and associate it with the inventory
-            stop_item = Stop_Item.objects.create(inventory_product=inventory_product, weight=weight, quantity=quantity, quantity_received=quantity)
+            stop_item = Stop_Item.objects.create(user=request.user,inventory_product=inventory_product, weight=weight, quantity=quantity, quantity_received=quantity)
 
             # Update the product batch amount (weight) and quantity
             inventory_product.remaining_weight -= weight
@@ -311,7 +310,7 @@ def inventory_to_invoice_item(request):
             formset_b = forms.TTInventoryToInvoiceItemFormsetB(instance=inventory_product, form_kwargs={'user': request.user})
 
             # Create a new Stop Item instance and associate it with the inventory
-            invoice_item = Invoice_Inventory.objects.create(inventory_product=inventory_product,invoice_model=invoice_model, amount=quantity)
+            invoice_item = Invoice_Inventory.objects.create(user=request.user,inventory_product=inventory_product,invoice_model=invoice_model, amount=quantity)
 
             # Update the product batch amount (weight) and quantity
             inventory_product.remaining_quantity -= quantity
@@ -655,7 +654,7 @@ def tt_inventory_create_form(request):
             formset_b = forms.TTInventoryCreateFormsetB(instance=sublot, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
-            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, inventory_name=inventory_name, location=location, sublot=sublot)
+            inventory = TT_Inventory.objects.create(user=request.user, inventory_name=inventory_name, location=location, sublot=sublot)
 
             # Make additional manipulations
             # Example: inventory_product.remaining_quantity -= quantity
@@ -699,7 +698,7 @@ def invoice_model_create_form(request):
             formset_a = forms.InvoiceModelCreateFormsetA(instance=inventory, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
-            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, invoice_name=invoice_name, inventory=inventory)
+            invoice = Invoice_Model.objects.create(user=request.user, invoice_name=invoice_name, inventory=inventory)
 
             # Make additional manipulations
             # Example: inventory_product.remaining_quantity -= quantity
@@ -725,16 +724,27 @@ def invoice_model_create_form(request):
 # Toggle Delete Views
 # ===================
 @login_required
-def tt_plant_batch_harvest_delete_form(request):
-    #harvest_batch = TT_Plant_Batch_Harvest.objects.get(uid=pk)
-
+def tt_location_delete_form(request):
+    
     if request.method == 'POST':
-        form = forms.TTPlantBatchHarvestDeleteForm(request.POST)
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTLocationDeleteForm(request.POST,user=user)
+        formset_a = forms.TTLocationDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
         if form.is_valid():
+
             deleted_item = form.cleaned_data['deleted_item'] 
 
+            form = forms.TTLocationDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTLocationDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
             # Create a new Product instance and associate it with the inventory
-            delete_batch = TT_Plant_Batch_Harvest_Delete.objects.create(deleted_item=deleted_item)
+            delete_batch = TT_Location_Delete.objects.create(user=request.user,deleted_item=deleted_item)
 
             # Update the product batch amount (weight) and quantity
             deleted_item.deleted = True
@@ -743,10 +753,534 @@ def tt_plant_batch_harvest_delete_form(request):
             
             return redirect('home')
     else:
-        form = forms.TTPlantBatchHarvestDeleteForm
-        #return redirect('about')
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTLocationDeleteForm(user=user)
+        formset_a = forms.TTLocationDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_location_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_sublot_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTSublotDeleteForm(request.POST,user=user)
+        formset_a = forms.TTSublotDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTSublotDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTSublotDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Sublot_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTSublotDeleteForm(user=user)
+        formset_a = forms.TTSublotDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_sublot_delete_form.html', {'form': form})
+
+
+@login_required
+def strain_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.StrainDeleteForm(request.POST,user=user)
+        formset_a = forms.StrainDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.StrainDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.StrainDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Strain_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.StrainDeleteForm(user=user)
+        formset_a = forms.StrainDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/strain_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_plant_batch_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTPlantBatchDeleteForm(request.POST,user=user)
+        formset_a = forms.TTPlantBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTPlantBatchDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTPlantBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Plant_Batch_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTPlantBatchDeleteForm(user=user)
+        formset_a = forms.TTPlantBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_plant_batch_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_plant_batch_harvest_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTPlantBatchHarvestDeleteForm(request.POST,user=user)
+        formset_a = forms.TTPlantBatchHarvestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTPlantBatchHarvestDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTPlantBatchHarvestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Plant_Batch_Harvest_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTPlantBatchHarvestDeleteForm(user=user)
+        formset_a = forms.TTPlantBatchHarvestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_plant_batch_harvest_delete_form.html', {'form': form})
+
+@login_required
+def tt_storage_batch_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTStorageBatchDeleteForm(request.POST,user=user)
+        formset_a = forms.TTStorageBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTStorageBatchDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTStorageBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Storage_Batch_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTStorageBatchDeleteForm(user=user)
+        formset_a = forms.TTStorageBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_storage_batch_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_product_batch_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTProductBatchDeleteForm(request.POST,user=user)
+        formset_a = forms.TTProductBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTProductBatchDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTProductBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Product_Batch_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTProductBatchDeleteForm(user=user)
+        formset_a = forms.TTProductBatchDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_product_batch_delete_form.html', {'form': form})
+
+
+@login_required
+def lab_result_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.LabResultDeleteForm(request.POST,user=user)
+        formset_a = forms.LabResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.LabResultDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.LabResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Lab_Result_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.LabResultDeleteForm(user=user)
+        formset_a = forms.LabResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/lab_result_delete_form.html', {'form': form})
+
+
+@login_required
+def lab_sample_result_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.LabSampleResultDeleteForm(request.POST,user=user)
+        formset_a = forms.LabSampleResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.LabSampleResultDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.LabSampleResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Lab_Sample_Result_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.LabSampleResultDeleteForm(user=user)
+        formset_a = forms.LabSampleResultDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/lab_sample_result_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_lab_sample_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTLabSampleDeleteForm(request.POST,user=user)
+        formset_a = forms.TTLabSampleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTLabSampleDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTLabSampleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Lab_Sample_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTLabSampleDeleteForm(user=user)
+        formset_a = forms.TTLabSampleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_lab_sample_delete_form.html', {'form': form})
+
+
+@login_required
+def tt_inventory_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTInventoryDeleteForm(request.POST,user=user)
+        formset_a = forms.TTInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTInventoryDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Inventory_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTInventoryDeleteForm(user=user)
+        formset_a = forms.TTInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_inventory_delete_form.html', {'form': form})
+
+@login_required
+def tt_inventory_product_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTInventoryProductDeleteForm(request.POST,user=user)
+        formset_a = forms.TTInventoryProductDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.TTInventoryProductDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTInventoryProductDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = TT_Inventory_Product_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.TTInventoryProductDeleteForm(user=user)
+        formset_a = forms.TTInventoryProductDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_inventory_product_delete_form.html', {'form': form})
+
+
+@login_required
+def invoice_model_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.InvoiceModelDeleteForm(request.POST,user=user)
+        formset_a = forms.InvoiceModelDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.InvoiceModelDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.InvoiceModelDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Invoice_Model_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.InvoiceModelDeleteForm(user=user)
+        formset_a = forms.InvoiceModelDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/invoice_model_delete_form.html', {'form': form})
+
+
+@login_required
+def invoice_inventory_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.InvoiceInventoryDeleteForm(request.POST,user=user)
+        formset_a = forms.InvoiceInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.InvoiceInventoryDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.InvoiceInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Invoice_Inventory_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            # Update the product batch amount (weight) and quantity
+            deleted_item.deleted = True
+            deleted_item.save()
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.InvoiceInventoryDeleteForm(user=user)
+        formset_a = forms.InvoiceInventoryDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/invoice_inventory_delete_form.html', {'form': form})
+
+
 
 
 # Filter & Search Views

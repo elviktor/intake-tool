@@ -55,6 +55,34 @@ urlpatterns = [
 # ==================================
      path('forms/tt_plant_batch_harvest_delete_form/', views.tt_plant_batch_harvest_delete_form, name='tt_plant_batch_harvest_delete_form'),
 
+     path('forms/tt_location_delete_form/', views.tt_location_delete_form, name='tt_location_delete_form'),
+
+     path('forms/tt_sublot_delete_form/', views.tt_sublot_delete_form, name='tt_sublot_delete_form'),
+
+     path('forms/strain_delete_form/', views.strain_delete_form, name='strain_delete_form'),
+
+     path('forms/tt_plant_batch_delete_form/', views.tt_plant_batch_delete_form, name='tt_plant_batch_delete_form'),
+
+     path('forms/tt_plant_batch_harvest_delete_form/', views.tt_plant_batch_harvest_delete_form, name='tt_plant_batch_harvest_delete_form'),
+
+     path('forms/tt_storage_batch_delete_form/', views.tt_storage_batch_delete_form, name='tt_storage_batch_delete_form'),
+
+     path('forms/tt_product_batch_delete_form/', views.tt_product_batch_delete_form, name='tt_product_batch_delete_form'),
+
+     path('forms/lab_result_delete_form/', views.lab_result_delete_form, name='lab_result_delete_form'),
+
+     path('forms/lab_sample_result_delete_form/', views.lab_sample_result_delete_form, name='lab_sample_result_delete_form'),
+
+     path('forms/tt_lab_sample_delete_form/', views.tt_lab_sample_delete_form, name='tt_lab_sample_delete_form'),
+
+     path('forms/tt_inventory_delete_form/', views.tt_inventory_delete_form, name='tt_inventory_delete_form'),
+
+     path('forms/tt_inventory_product_delete_form/', views.tt_inventory_product_delete_form, name='tt_inventory_product_delete_form'),
+
+     path('forms/invoice_model_delete_form/', views.invoice_model_delete_form, name='invoice_model_delete_form'),
+
+     path('forms/invoice_inventory_delete_form/', views.invoice_inventory_delete_form, name='invoice_inventory_delete_form'),
+
 
 # Search URLs
 #==============
