@@ -90,8 +90,8 @@
 
                 <!--- Sidemenu -->
                 <div id="sidebar-menu">
-                    <!-- Left Menu Start -->
-                    <ul class="metismenu list-unstyled" id="side-menu">
+                    <!-- Left Menu Start ('metismenu' in ul)-->
+                    <ul class="list-unstyled" id="side-menu">
                         
                         <li class="menu-title">System Setup</li>
 
@@ -101,8 +101,8 @@
                                 <span>Locations</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'tt_location_create' %}">Create</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_location_create_form' %}">Create</a></li>
+                                <li><a href="auth-register.html">View</a></li>
                             </ul>
                         </li>
 
@@ -112,8 +112,8 @@
                                 <span>Sublots</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{% url 'tt_sublot_create' %}">Create</a></li>
-                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                                <li><a href="{% url 'tt_sublot_create_form' %}">Create</a></li>
+                                <li><a href="pages-maintenance.html">View</a></li>
                             </ul>
                         </li>
 
@@ -123,8 +123,8 @@
                                 <span>Genetics</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'strain_create' %}">Create</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'strain_create_form' %}">Create</a></li>
+                                <li><a href="auth-register.html">View</a></li>
                             </ul>
                         </li>
 
@@ -137,7 +137,7 @@
                                 <span>Plants</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'tt_plant_batch_create' %}">Create Batch</a></li>
+                                <li><a href="{% url 'tt_plant_batch_create_form' %}">Create Batch</a></li>
                                 <li><a target="_self" href="auth-register.html">View</a></li>
                             </ul>
                         </li>
@@ -148,7 +148,7 @@
                                 <span>Harvests</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{% url 'tt_plant_batch_harvest_create' %}">Create Batch</a></li>
+                                <li><a href="{% url 'tt_plant_batch_harvest_create_form' %}">Create Batch</a></li>
                                 <li><a target="_self" href="pages-maintenance.html">View</a></li>
                             </ul>
                         </li>
@@ -159,8 +159,8 @@
                                 <span>Storage</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'tt_harvest_to_storage_form' %}">Create Batch</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
+                                <li><a href="{% url 'tt_harvest_to_storage_form' %}">Create Batch</a></li>
+                                <li><a href="auth-register.html">View</a></li>
                             </ul>
                         </li>
 
@@ -171,7 +171,7 @@
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_storage_to_product_form' %}">Create Batch</a></li>
-                                <li><a target="_self" href="pages-maintenance.html">View</a></li>
+                                <li><a href="pages-maintenance.html">View</a></li>
                             </ul>
                         </li>
 
@@ -181,8 +181,8 @@
                                 <span>Lab Samples</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'lab_result_create' %}">Store Lab Result</a></li>
-                                <li><a target="_self" href="{% url 'lab_sample_result_create' %}">Store Lab Sample Result</a></li>
+                                <li><a target="_self" href="{% url 'lab_result_create_form' %}">Store Lab Result</a></li>
+                                <li><a target="_self" href="{% url 'lab_sample_result_create_form' %}">Store Lab Sample Result</a></li>
                                 <li><a target="_self" href="{% url 'tt_product_to_lab_sample_form' %}">Store Lab Sample Set</a></li>
                                 <li><a target="_self" href="auth-register.html">View</a></li>
                             </ul>
@@ -194,7 +194,7 @@
                                 <span>Inventory</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{% url 'tt_inventory_create' %}">Create Inventory</a></li>
+                                <li><a href="{% url 'tt_inventory_create_form' %}">Create Inventory</a></li>
                                 <li><a href="{% url 'tt_product_to_inventory_form' %}">Add Product</a></li>
                                 <li><a target="_self" href="pages-maintenance.html">View</a></li>
                             </ul>
@@ -206,29 +206,11 @@
                                 <span>Invoices</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="pages-starter.html">Create</a></li>
-                                <li><a href="pages-starter.html">Add Product</a></li>
+                                <li><a href="{% url 'invoice_model_create_form' %}">Create</a></li>
+                                <li><a href="{% url 'tt_inventory_to_invoice_item_form' %}">Add Product</a></li>
                                 <li><a target="_self" href="pages-maintenance.html">View</a></li>
                             </ul>
-                        </li>
-
-                        <li>
-                            <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="ri-account-circle-line"></i>
-                                <span>Transport Manifests</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'manifest_driver_create' %}">Register Driver</a></li>
-                                <li><a target="_self" href="{% url 'manifest_vehicle_create' %}">Register Vehicle</a></li>
-                                <li><a target="_self" href="{% url 'manifest_thirdpartytransporter_create' %}">Third Party Transporter</a></li>
-                                <li><a target="_self" href="{% url 'manifest_thirdpartytransporter_create' %}">Create Manifest Stop</a></li>
-                                <li><a href="{% url 'tt_inventory_to_stop_item_form' %}">Add Stop Item</a></li>
-                                <li><a target="_self" href="{% url 'manifest_stop_create' %}">Create Manifest</a></li>
-                                <li><a target="_self" href="auth-register.html">View</a></li>
-                            </ul>
-                        </li>
-
-                        
+                        </li>                    
 
                         <li class="menu-title">Reporting</li>
 
@@ -256,9 +238,15 @@
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
-        <div class="container p-4 mt-5">
-            {% block content %}
-            {% endblock content %}
+        <div class="container-fluid p-4 mt-5">
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
         </div>
         <!-- end main content-->
 
@@ -286,6 +274,6 @@
 
     <!-- App js -->
     <script src="{% static 'js/app.js' %}"></script>
-    <script src="{% static 'js/ajax.js' %}"></script>
+    <!-- <script src="{% static 'js/ajax.js' %}"></script> -->
 </body>
 </html>

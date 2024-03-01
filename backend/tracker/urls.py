@@ -31,7 +31,25 @@ urlpatterns = [
 
      path('forms/inventory_to_invoice_item/', views.inventory_to_invoice_item, name='tt_inventory_to_invoice_item_form'),
 
+     path('forms/strain_create_form/', views.strain_create_form, name='strain_create_form'),
+
+     path('forms/lab_result_create_form/', views.lab_result_create_form, name='lab_result_create_form'),
+
+     path('forms/lab_sample_result_create_form/', views.lab_sample_result_create_form, name='lab_sample_result_create_form'),
+
+     path('forms/tt_inventory_create_form/', views.tt_inventory_create_form, name='tt_inventory_create_form'),
+
+     path('forms/invoice_model_create_form/', views.invoice_model_create_form, name='invoice_model_create_form'),
+
+     path('forms/tt_location_create_form/', views.tt_location_create_form, name='tt_location_create_form'),
+
+     path('forms/tt_sublot_create_form/', views.tt_sublot_create_form, name='tt_sublot_create_form'),
+
+     path('forms/tt_plant_batch_create_form/', views.tt_plant_batch_create_form, name='tt_plant_batch_create_form'),
+     
      path('forms/tt_plant_batch_harvest_create_form/', views.tt_plant_batch_harvest_create_form, name='tt_plant_batch_harvest_create_form'),
+
+
 
 # Toggle Delete Form URLs
 # ==================================

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -20,11 +21,22 @@ from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Locatio
 
 #https://stackoverflow.com/questions/53742129/how-do-you-modify-form-data-before-saving-it-while-using-djangos-createview
 
+@login_required
 def harvest_to_storage(request):
     #harvest_batch = TT_Plant_Batch_Harvest.objects.get(uid=pk)
 
     if request.method == 'POST':
-        form = forms.TTHarvestToStorageForm(request.POST)
+
+        harvest_batch = None
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTHarvestToStorageForm(request.POST, user=user)
+        formset_a = forms.TTHarvestToStorageFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTHarvestToStorageFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
+
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             wet_dry = form.cleaned_data['wet_dry']
@@ -32,8 +44,13 @@ def harvest_to_storage(request):
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot'] 
 
+            form = forms.TTHarvestToStorageForm(request.POST, instance=harvest_batch, user=user)
+            formset_a = forms.TTHarvestToStorageFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+            formset_b = forms.TTHarvestToStorageFormsetB(instance=location, form_kwargs={'user': request.user})
+            formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
+
             # Create a new Product instance and associate it with the inventory
-            storage_batch = TT_Storage_Batch.objects.create(harvest_batch=harvest_batch,location=location, sublot=sublot, weight=weight)
+            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location=location, sublot=sublot, weight=weight)
 
             if wet_dry == "wet":
                 # Update the harvest batch weight
@@ -49,53 +66,114 @@ def harvest_to_storage(request):
             
             return redirect('home')
     else:
-        form = forms.TTHarvestToStorageForm
-        #return redirect('about')
+
+        harvest_batch = None
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTHarvestToStorageForm(user=user)
+        formset_a = forms.TTHarvestToStorageFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTHarvestToStorageFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_harvest_to_storage_form.html', {'form': form})
 
+@login_required
 def storage_to_product(request):
+
     if request.method == 'POST':
-        form = forms.TTStorageToProductForm(request.POST)
+
+        harvest_batch = None
+        storage_batches = None
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTStorageToProductForm(request.POST,user=user)
+        formset_a = forms.TTStorageToProductFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTStorageToProductFormsetB(instance=storage_batches, form_kwargs={'user': request.user})
+        formset_c = forms.TTStorageToProductFormsetC(instance=location, form_kwargs={'user': request.user})
+        formset_d = forms.TTStorageToProductFormsetD(instance=sublot, form_kwargs={'user': request.user})
+
+
         if form.is_valid():
+            product_name = form.cleaned_data['product_name']
             wet_dry = form.cleaned_data['wet_dry']
             storage_batches = form.cleaned_data['storage_batches']
             harvest_batch = form.cleaned_data['harvest_batch']
-            strain = form.cleaned_data['strain']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot']
+            total_weight = form.cleaned_data['total_weight']
+            total_quantity = form.cleaned_data['total_quantity']
 
-            total_weight = 0.0
-
-            for batch in storage_batches:
-                total_weight += batch.weight
+            form = forms.TTStorageToProductForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTStorageToProductFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+            formset_b = forms.TTStorageToProductFormsetB(instance=storage_batches, form_kwargs={'user': request.user})
+            formset_c = forms.TTStorageToProductFormsetC(instance=location, form_kwargs={'user': request.user})
+            formset_d = forms.TTStorageToProductFormsetD(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new instance
-            product_batch = TT_Product_Batch.objects.create( harvest_batch=harvest_batch, location=location, sublot=sublot, total_weight=total_weight, strain=strain)
+            product_batch = TT_Product_Batch.objects.create( product_name=product_name, harvest_batch=harvest_batch, storage_batches=storage_batches, location=location, sublot=sublot, total_weight=total_weight, remaining_weight=total_weight, total_quantity=total_quantity, remaining_quantity=total_quantity,  wet_dry=wet_dry)
             
             form.save()
 
             return redirect('home')
     else:
-        form = forms.TTStorageToProductForm
-        #return redirect('about')
+        harvest_batch = None
+        storage_batches = None
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTStorageToProductForm(user=user)
+        formset_a = forms.TTStorageToProductFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTStorageToProductFormsetB(instance=storage_batches, form_kwargs={'user': request.user})
+        formset_c = forms.TTStorageToProductFormsetC(instance=location, form_kwargs={'user': request.user})
+        formset_d = forms.TTStorageToProductFormsetD(instance=sublot, form_kwargs={'user': request.user})
+        
 
     return render(request, 'tracker/tt_storage_to_product_form.html', {'form': form})
 
-
+@login_required
 def product_to_lab_sample(request):
     
     if request.method == 'POST':
-        form = forms.TTProductToLabSampleForm(request.POST)
+
+        product_batch = None
+        location = None
+        sublot = None
+        results = None
+        test_results = None
+        user = request.user
+
+        form = forms.TTProductToLabSampleForm(request.POST,user=user)
+        formset_a = forms.TTProductToLabSampleFormsetA(instance=product_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTProductToLabSampleFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTProductToLabSampleFormsetC(instance=sublot, form_kwargs={'user': request.user})
+        formset_d = forms.TTProductToLabSampleFormsetD(instance=results, form_kwargs={'user': request.user})
+        formset_e = forms.TTProductToLabSampleFormsetE(instance=test_results, form_kwargs={'user': request.user})
+
+
         if form.is_valid():
+            sample_name = form.cleaned_data['sample_name']
             amount = form.cleaned_data['amount'] 
             quantity = form.cleaned_data['quantity']
             product_batch = form.cleaned_data['product_batch']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot'] 
+            results = form.cleaned_data['results'] 
+            test_results = form.cleaned_data['test_results'] 
+
+            form = forms.TTProductToLabSampleForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTProductToLabSampleFormsetA(instance=product_batch, form_kwargs={'user': request.user})
+            formset_b = forms.TTProductToLabSampleFormsetB(instance=location, form_kwargs={'user': request.user})
+            formset_c = forms.TTProductToLabSampleFormsetC(instance=sublot, form_kwargs={'user': request.user})
+            formset_d = forms.TTProductToLabSampleFormsetD(instance=results, form_kwargs={'user': request.user})
+            formset_e = forms.TTProductToLabSampleFormsetE(instance=test_results, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            lab_sample_batch = TT_Lab_Sample.objects.create(product_batch=product_batch,location=location, sublot=sublot, amount=amount, quantity=quantity)
+            lab_sample_batch = TT_Lab_Sample.objects.create(sample_name=sample_name, product_batch=product_batch, location=location, sublot=sublot, amount=amount, quantity=quantity, results=results, test_results=test_results)
 
             # Update the product batch amount (weight) and quantity
             product_batch.remaining_weight -= amount
@@ -106,25 +184,49 @@ def product_to_lab_sample(request):
             return redirect('home')
     
     else:
-        form = forms.TTProductToLabSampleForm
-        #return redirect('about')
+        product_batch = None
+        location = None
+        sublot = None
+        results = None
+        test_results = None
+        user = request.user
+
+        form = forms.TTProductToLabSampleForm(user=user)
+        formset_a = forms.TTProductToLabSampleFormsetA(instance=product_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTProductToLabSampleFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTProductToLabSampleFormsetC(instance=sublot, form_kwargs={'user': request.user})
+        formset_d = forms.TTProductToLabSampleFormsetD(instance=results, form_kwargs={'user': request.user})
+        formset_e = forms.TTProductToLabSampleFormsetE(instance=test_results, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_product_to_lab_sample_form.html', {'form': form})
 
-
+@login_required
 def product_to_inventory(request):
     
     if request.method == 'POST':
-        form = forms.TTProductToInventoryForm(request.POST)
+        
+        inventory = None
+        product_batch = None
+        user = request.user
+        
+        form = forms.TTProductToInventoryForm(request.POST,user=user)
+        formset_a = forms.TTProductToInventoryFormsetA(instance=inventory, form_kwargs={'user': request.user})
+        formset_b = forms.TTProductToInventoryFormsetB(instance=product_batch, form_kwargs={'user': request.user})
+        
         if form.is_valid():
             total_amount = form.cleaned_data['total_amount'] 
             total_quantity = form.cleaned_data['total_quantity']
             product_batch = form.cleaned_data['product_batch']
             location = form.cleaned_data['location']
+            inventory = form.cleaned_data['inventory']
             sublot = form.cleaned_data['sublot'] 
 
+            form = forms.TTProductToInventoryForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTProductToInventoryFormsetA(instance=inventory, form_kwargs={'user': request.user})
+            formset_b = forms.TTProductToInventoryFormsetB(instance=product_batch, form_kwargs={'user': request.user})
+
             # Create a new Product instance and associate it with the inventory
-            inventory_batch = TT_Inventory.objects.create(product_batch=product_batch,location=location, sublot=sublot, total_amount=total_amount, remaining_amount=total_amount, total_quantity=total_quantity, remaining_quantity=total_quantity)
+            inventory_batch = TT_Inventory_Product.objects.create(inventory=inventory, product_batch=product_batch,location=location, sublot=sublot, total_amount=total_amount, remaining_amount=total_amount, total_quantity=total_quantity, remaining_quantity=total_quantity)
 
             # Update the product batch amount (weight) and quantity
             product_batch.remaining_weight -= total_amount
@@ -135,25 +237,38 @@ def product_to_inventory(request):
             return redirect('home')
     
     else:
-        form = forms.TTProductToInventoryForm
-        #return redirect('about')
+        inventory = None
+        product_batch = None
+        user = request.user
+        
+        form = forms.TTProductToInventoryForm(user=user)
+        formset_a = forms.TTProductToInventoryFormsetA(instance=inventory, form_kwargs={'user': request.user})
+        formset_b = forms.TTProductToInventoryFormsetB(instance=product_batch, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_product_to_inventory_form.html', {'form': form})
 
-
+@login_required
 def inventory_to_stop_item(request):
     
     if request.method == 'POST':
+
+        inventory_product = None
+        user = request.user
+
         form = forms.TTInventoryToStopItemForm(request.POST)
+        formset_a = forms.TTInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
+
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
             quantity = form.cleaned_data['quantity']
             inventory_product = form.cleaned_data['inventory_product']
-            location = form.cleaned_data['location']
-            sublot = form.cleaned_data['sublot'] 
+            
+            form = forms.TTInventoryToStopItemForm(request.POST, instance=user, user=user)
+            formset_a = forms.TInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
+
 
             # Create a new Stop Item instance and associate it with the inventory
-            stop_item = Stop_Item.objects.create(inventory_product=inventory_product,location=location, sublot=sublot, weight=weight, quantity=quantity, received_quantity=quantity)
+            stop_item = Stop_Item.objects.create(inventory_product=inventory_product, weight=weight, quantity=quantity, quantity_received=quantity)
 
             # Update the product batch amount (weight) and quantity
             inventory_product.remaining_weight -= weight
@@ -164,23 +279,39 @@ def inventory_to_stop_item(request):
             return redirect('home')
     
     else:
-        form = forms.TTInventoryToStopItemForm
-        #return redirect('about')
+        inventory_product = None
+        user = request.user
+        
+        form = forms.TTInventoryToStopItemForm(user=user)
+        formset_a = forms.TTInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
 
-
+@login_required
 def inventory_to_invoice_item(request):
     
     if request.method == 'POST':
-        form = forms.TTInventoryToInvoiceItemForm(request.POST)
+
+        invoice_model = None
+        inventory_product = None
+        user = request.user
+        
+        form = forms.TTInventoryToInvoiceItemForm(request.POST,user=user)
+        formset_a = forms.TTInventoryToInvoiceItemFormsetA(instance=invoice_model, form_kwargs={'user': request.user})
+        formset_b = forms.TTInventoryToInvoiceItemFormsetB(instance=inventory_product, form_kwargs={'user': request.user})
+        
         if form.is_valid():
             quantity = form.cleaned_data['amount']
+            invoice_model = form.cleaned_date['invoice_model']
             inventory_product = form.cleaned_data['inventory_product']
-            invoice = form.cleaned_date['invoice']
             
+            
+            form = forms.TTInventoryToInvoiceItemForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTInventoryToInvoiceItemFormsetA(instance=invoice_model, form_kwargs={'user': request.user})
+            formset_b = forms.TTInventoryToInvoiceItemFormsetB(instance=inventory_product, form_kwargs={'user': request.user})
+
             # Create a new Stop Item instance and associate it with the inventory
-            invoice_item = Invoice_Inventory.objects.create(inventory_product=inventory_product,invoice=invoice, amount=quantity)
+            invoice_item = Invoice_Inventory.objects.create(inventory_product=inventory_product,invoice_model=invoice_model, amount=quantity)
 
             # Update the product batch amount (weight) and quantity
             inventory_product.remaining_quantity -= quantity
@@ -190,21 +321,271 @@ def inventory_to_invoice_item(request):
             return redirect('home')
     
     else:
-        form = forms.TTInventoryToInvoiceItemForm
-        #return redirect('about')
+        invoice_model = None
+        inventory_product = None
+        user = request.user
+        
+        form = forms.TTInventoryToInvoiceItemForm(user=user)
+        formset_a = forms.TTInventoryToInvoiceItemFormsetA(instance=invoice_model, form_kwargs={'user': request.user})
+        formset_b = forms.TTInventoryToInvoiceItemFormsetB(instance=inventory_product, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
 
 
+# Custom User-Only Model Create Views
+# ===================================
+@login_required
+def strain_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.StrainCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            name = form.cleaned_data['name']
+
+            form = forms.StrainCreateForm(request.POST, instance=user, user=user)
+        
+            
+            # Create a new Model instance and associate it with the batch
+            strain = Strain.objects.create(user=request.user, name=name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.StrainCreateForm(user=user)
+
+    return render(request, 'tracker/strain_create_form.html', {'form': form})
+
+@login_required
+def lab_result_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.LabResultCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            name = form.cleaned_data['name']
+
+            form = forms.LabResultCreateForm(request.POST, instance=user, user=user)
+        
+            # Create a new Model instance and associate it with the batch
+            lab_result = Lab_Result.objects.create(user=request.user, name=name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.LabResultCreateForm(user=user)
+
+    return render(request, 'tracker/lab_result_create_form.html', {'form': form})
+
+@login_required
+def lab_sample_result_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.LabSampleResultCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            sample_name = form.cleaned_data['sample_name']
+
+            form = forms.LabSampleResultCreateForm(request.POST, instance=user, user=user)
+        
+            # Create a new Model instance and associate it with the batch
+            lab_sample_result = Lab_Sample_Result.objects.create(user=request.user, sample_name=sample_name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.LabSampleResultCreateForm(user=user)
+
+    return render(request, 'tracker/lab_sample_result_create_form.html', {'form': form})
+
+@login_required
+def tt_location_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.TTLocationCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            name = form.cleaned_data['name']
+
+            form = forms.TTLocationCreateForm(request.POST, instance=user, user=user)
+        
+            # Create a new Model instance and associate it with the batch
+            location = TT_Location.objects.create(user=request.user, name=name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.TTLocationCreateForm(user=user)
+
+    return render(request, 'tracker/tt_location_create_form.html', {'form': form})
+
+@login_required
+def tt_sublot_create_form(request):
+    
+    if request.method == 'POST':
+
+        location = None
+        user = request.user
+
+        form = forms.TTSublotCreateForm(request.POST,user=user)
+        formset = forms.TTSublotCreateFormset(instance=location, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            location = form.cleaned_data['location']
+            sublot_name = form.cleaned_data['sublot_name']
+
+            form = forms.TTSublotCreateForm(request.POST, instance=location, user=user)
+            formset = forms.TTSublotCreateFormset(request.POST, instance=location, form_kwargs={'user': request.user})
+            
+            # Create a new Model instance and associate it with the batch
+            sublot = TT_Sublot.objects.create(user=request.user, location=location, sublot_name=sublot_name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        location = None
+        user = request.user
+
+        #form = forms.TTPlantBatchHarvestCreateForm
+
+        form = forms.TTSublotCreateForm(user=user)
+        formset = forms.TTSublotCreateFormset(instance=location, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_sublot_create_form.html', {'form': form})
+
+@login_required
+def tt_plant_batch_create_form(request):
+    
+    if request.method == 'POST':
+
+        strain = None
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTPlantBatchCreateForm(request.POST,user=user)
+        formset_a = forms.TTPlantBatchCreateFormsetA(instance=strain, form_kwargs={'user': request.user})
+        formset_b = forms.TTPlantBatchCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTPlantBatchCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
+
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            strain = form.cleaned_data['strain']
+            location = form.cleaned_data['location']
+            sublot = form.cleaned_data['sublot']
+            
+            form = forms.TTPlantBatchCreateForm(request.POST, instance=location, user=user)
+            formset_a = forms.TTPlantBatchCreateFormsetA(instance=strain, form_kwargs={'user': request.user})
+            formset_b = forms.TTPlantBatchCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+            formset_c = forms.TTPlantBatchCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
+            
+            # Create a new Model instance and associate it with the batch
+            plant_batch = TT_Plant_Batch.objects.create(user=request.user, strain=strain, location=location, sublot=sublot)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        strain = None
+        location = None
+        sublot = None
+        user = request.user
+
+        #form = forms.TTPlantBatchHarvestCreateForm
+
+        form = forms.TTPlantBatchCreateForm(user=user)
+        formset_a = forms.TTPlantBatchCreateFormsetA(instance=strain, form_kwargs={'user': request.user})
+        formset_b = forms.TTPlantBatchCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTPlantBatchCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_plant_batch_create_form.html', {'form': form})
+
+
+@login_required
 def tt_plant_batch_harvest_create_form(request):
     
     if request.method == 'POST':
 
         plant_batch = None
+        location = None
+        sublot = None
         user = request.user
 
         form = forms.TTPlantBatchHarvestCreateForm(request.POST,user=user)
-        formset = forms.TTPlantBatchHarvestCreateFormset(instance=plant_batch, form_kwargs={'user': request.user})
+        formset_a = forms.TTPlantBatchHarvestCreateFormsetA(instance=plant_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTPlantBatchHarvestCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTPlantBatchHarvestCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
         
         if form.is_valid():
             
@@ -217,7 +598,9 @@ def tt_plant_batch_harvest_create_form(request):
             total_wet_weight = form.cleaned_data['total_wet_weight']
 
             form = forms.TTPlantBatchHarvestCreateForm(request.POST, instance=plant_batch, user=user)
-            formset = forms.TTPlantBatchHarvestCreateFormset(request.POST, instance=plant_batch, form_kwargs={'user': request.user})
+            formset_a = forms.TTPlantBatchHarvestCreateFormsetA(instance=plant_batch, form_kwargs={'user': request.user})
+            formset_b = forms.TTPlantBatchHarvestCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+            formset_c = forms.TTPlantBatchHarvestCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
             harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, plant_batch=plant_batch, location=location, sublot=sublot, total_wet_weight=total_wet_weight,total_dry_weight=total_dry_weight,remaining_wet_weight=total_wet_weight, remaining_dry_weight=total_dry_weight)
@@ -233,19 +616,115 @@ def tt_plant_batch_harvest_create_form(request):
     else:
 
         plant_batch = None
+        location = None
+        sublot = None
         user = request.user
 
         #form = forms.TTPlantBatchHarvestCreateForm
 
         form = forms.TTPlantBatchHarvestCreateForm(user=user)
-        formset = forms.TTPlantBatchHarvestCreateFormset(instance=plant_batch, form_kwargs={'user': request.user})
+        formset_a = forms.TTPlantBatchHarvestCreateFormsetA(instance=plant_batch, form_kwargs={'user': request.user})
+        formset_b = forms.TTPlantBatchHarvestCreateFormsetB(instance=location, form_kwargs={'user': request.user})
+        formset_c = forms.TTPlantBatchHarvestCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_plant_batch_harvest_create_form.html', {'form': form})
+
+@login_required
+def tt_inventory_create_form(request):
+    
+    if request.method == 'POST':
+
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTInventoryCreateForm(request.POST,user=user)
+        formset_a = forms.TTInventoryCreateFormsetA(instance=location, form_kwargs={'user': request.user})
+        formset_b = forms.TTInventoryCreateFormsetB(instance=sublot, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            location = form.cleaned_data['location']
+            sublot = form.cleaned_data['sublot']
+            inventory_name = form.cleaned_data['inventory_name']
+
+            form = forms.TTInventoryCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTInventoryCreateFormsetA(instance=location, form_kwargs={'user': request.user})
+            formset_b = forms.TTInventoryCreateFormsetB(instance=sublot, form_kwargs={'user': request.user})
+            
+            # Create a new Model instance and associate it with the batch
+            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, inventory_name=inventory_name, location=location, sublot=sublot)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        location = None
+        sublot = None
+        user = request.user
+
+        form = forms.TTInventoryCreateForm(user=user)
+        formset_a = forms.TTInventoryCreateFormsetA(instance=location, form_kwargs={'user': request.user})
+        formset_b = forms.TTInventoryCreateFormsetB(instance=sublot, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_inventory_create_form.html', {'form': form})
+
+@login_required
+def invoice_model_create_form(request):
+    
+    if request.method == 'POST':
+
+        inventory = None
+        user = request.user
+
+        form = forms.InvoiceModelCreateForm(request.POST,user=user)
+        formset_a = forms.InvoiceModelCreateFormsetA(instance=inventory, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            inventory = form.cleaned_data['inventory']
+            invoice_name = form.cleaned_data['invoice_name']
+
+            form = forms.InvoiceModelCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.InvoiceModelCreateFormsetA(instance=inventory, form_kwargs={'user': request.user})
+            
+            # Create a new Model instance and associate it with the batch
+            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, invoice_name=invoice_name, inventory=inventory)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        inventory = None
+        user = request.user
+
+        form = forms.InvoiceModelCreateForm(user=user)
+        formset_a = forms.InvoiceModelCreateFormsetA(instance=inventory, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/invoice_model_create_form.html', {'form': form})
+
+
 
 
 # Toggle Delete Views
 # ===================
-
+@login_required
 def tt_plant_batch_harvest_delete_form(request):
     #harvest_batch = TT_Plant_Batch_Harvest.objects.get(uid=pk)
 
@@ -273,7 +752,7 @@ def tt_plant_batch_harvest_delete_form(request):
 # Filter & Search Views
 # =====================
 
-class TTPlantBatchHarvestSearch(View):
+class TTPlantBatchHarvestSearch(LoginRequiredMixin, View):
     template_name = 'tracker/tt_plant_batch_harvest_search.html'
 
     def get(self, request, *args, **kwargs):

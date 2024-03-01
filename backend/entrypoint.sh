@@ -11,9 +11,9 @@ echo "Let's go!"
 #python manage.py makemigrations
 #python manage.py migrate
 #echo "Migrations made"
-python manage.py makemigrations tracker
-python manage.py migrate tracker
-echo "Tracker Migrations made"
+#python manage.py makemigrations tracker
+#python manage.py migrate tracker
+#echo "Tracker Migrations made"
 #python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
 python manage.py runserver "0.0.0.0:8000"
 
