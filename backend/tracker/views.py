@@ -6,7 +6,7 @@ from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from . import forms
-from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete
+from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info
 
 # Contents
 # ========
@@ -435,6 +435,43 @@ def lab_sample_result_create_form(request):
         form = forms.LabSampleResultCreateForm(user=user)
 
     return render(request, 'tracker/lab_sample_result_create_form.html', {'form': form})
+
+
+@login_required
+def tt_user_info_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.TTUserInfoCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            company_name = form.cleaned_data['company_name']
+
+            form = forms.TTUserInfoCreateForm(request.POST, instance=user, user=user)
+        
+            # Create a new Model instance and associate it with the batch
+            user_info = TT_User_Info.objects.create(user=request.user, company_name=company_name)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.TTUserInfoCreateForm(user=user)
+
+    return render(request, 'tracker/tt_user_info_create_form.html', {'form': form})
+
+
 
 @login_required
 def tt_location_create_form(request):
@@ -1345,6 +1382,19 @@ class TTInventoryProductDelete(LoginRequiredMixin,DeleteView):
     model = TT_Inventory_Product
     success_url = reverse_lazy('home')
 
+class TTUserInfoCreate(LoginRequiredMixin,CreateView):
+    model = TT_User_Info
+    fields = '__all__'
+
+class TTUserInfoUpdate(LoginRequiredMixin,UpdateView):
+    model = TT_User_Info
+    fields = '__all__'
+    success_url = reverse_lazy('home')
+
+class TTUserInfoDelete(LoginRequiredMixin,DeleteView):
+    model = TT_User_Info
+    success_url = reverse_lazy('home')
+
 class TTLocationCreate(LoginRequiredMixin,CreateView):
     model = TT_Location
     fields = '__all__'
@@ -1749,6 +1799,10 @@ class TTInventoryDetailView(LoginRequiredMixin,generic.DetailView):
 class TTInventoryProductDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""
     model = TT_Inventory_Product
+
+class TTUserInfoDetailView(LoginRequiredMixin,generic.DetailView):
+    """Generic class-based detail view."""
+    model = TT_User_Info
 
 class TTLocationDetailView(LoginRequiredMixin,generic.DetailView):
     """Generic class-based detail view."""

@@ -94,7 +94,18 @@
                     <ul class="list-unstyled" id="side-menu">
                         
                         <li class="menu-title">System Setup</li>
+                        
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="bi bi-house-add"></i>
 
+                                <span>User Info</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_user_info_create_form' %}">Create</a></li>
+                            </ul>
+                        </li>
+                        
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="bi bi-house-add"></i>

@@ -1,13 +1,24 @@
 from django import forms
 from django.forms.models import ModelForm
 from django.forms import inlineformset_factory
-from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete
+from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info
+
+# Date Widget
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+class DateTimeInput(forms.DateTimeInput):
+   input_type = 'datetime'
 
 
 class TTHarvestToStorageForm(ModelForm):
    class Meta:
       model = TT_Storage_Batch
       fields = ['harvest_batch','package_number','location_date','location','sublot','from_row','to_row','wet_dry','produce_category','weight','status','converted','destroy_reason','destroy_reason_id','destroy_scheduled','destroy_scheduled_time','notes']
+      widgets = {
+            'location_date': DateInput(),
+            'destroy_scheduled_time': DateTimeInput(),
+        }
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -44,6 +55,10 @@ class TTStorageToProductForm(ModelForm):
    class Meta:
       model = TT_Product_Batch
       fields = ['product_name','product_category','harvest_batch','storage_batches','location','sublot','from_row','to_row','uom','total_quantity','total_weight', 'available','wet_dry','packaging','wholesale_price','msrp','moq','thc_percent','terp_percent','thc_mg','thc_mg_per_serving','grow_type','description','sell_points','expiration_date','use_by_date','sku','coa','tested','notes']
+      widgets = {
+            'expiration_date': DateInput(),
+            'use_by_date': DateInput(),
+        }
 
 
    def __init__(self, *args, user, **kwargs):
@@ -72,7 +87,7 @@ TTStorageToProductFormsetD = inlineformset_factory(
 class TTProductToLabSampleForm(ModelForm):
    class Meta:
       model = TT_Lab_Sample
-      fields = ['sample_name','product_batch','active','location','sublot','from_row','to_row','amount','amount_used','quantity','biotrack_id','inventory_id','inventory_type','lab_license','location_license','medical_grade','parent_id','result','results','rn_d','sample_use','session_time','test_results','transaction_id','notes']
+      fields = ['sample_name','product_batch','active','location','sublot','from_row','to_row','amount','amount_used','quantity','biotrack_id','inventory_id','inventory_type','lab_license','location_license','medical_grade','parent_id','result','results','rn_d','sample_use','test_results','transaction_id','notes']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -129,7 +144,7 @@ TTProductToLabSampleFormsetE = inlineformset_factory(
 class TTProductToInventoryForm(ModelForm):
    class Meta:
       model = TT_Inventory_Product
-      fields = ['inventory','product_batch','product_name','qa_status','total_quantity','remaining_quantity','total_amount','remaining_amount','unit_based','usable_weight','rec_usable_weight','med_usable_weight','medicated','seized','session_time','status','transaction_id','notes']
+      fields = ['inventory','product_batch','qa_status','total_quantity','remaining_quantity','total_amount','remaining_amount','unit_based','usable_weight','rec_usable_weight','med_usable_weight','medicated','seized','status','transaction_id','notes']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -171,7 +186,7 @@ TTProductToInventoryFormsetB = inlineformset_factory(
 class TTInventoryToStopItemForm(ModelForm):
    class Meta:
       model = Stop_Item
-      fields = ['inventory_product','description','biotrack_id','inventory_id','manifest_id','quantity','quantity_received','session_time','stop_number','transaction_id','weight']
+      fields = ['inventory_product','description','biotrack_id','inventory_id','manifest_id','quantity','quantity_received','stop_number','transaction_id','weight']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -274,6 +289,16 @@ class LabSampleResultCreateForm(ModelForm):
       super().__init__(*args, **kwargs)
 
 
+class TTUserInfoCreateForm(ModelForm):
+   class Meta:
+      model = TT_User_Info
+      fields = ['company_name','company_ocm_license','contact_first_name','contact_last_name','contact_email','contact_phone','contact_website','contact_address','contact_city','contact_state','contact_zip','notes']
+   
+   def __init__(self, *args, user, **kwargs):
+      self.user = user
+      super().__init__(*args, **kwargs)
+
+
 class TTLocationCreateForm(ModelForm):
    class Meta:
       model = TT_Location
@@ -306,7 +331,11 @@ class TTPlantBatchCreateForm(ModelForm):
    
    class Meta:
       model = TT_Plant_Batch
-      fields = ['birth_date','strain','quantity','location','sublot','from_row','to_row','mother','org_id','parent_id','room_id','converted','destroy_reason','destroy_reason_id','destroy_scheduled','destroy_scheduled_time','external_id','harvest_scheduled','session_time','state','transaction_id','notes']
+      fields = ['birth_date','strain','quantity','location','sublot','from_row','to_row','mother','org_id','parent_id','room_id','converted','destroy_reason','destroy_reason_id','destroy_scheduled','destroy_scheduled_time','external_id','harvest_scheduled','state','transaction_id','notes']
+      widgets = {
+            'birth_date': DateInput(),
+            'destroy_scheduled_time': DateInput(),
+        }
    
    def __init__(self, *args, user, **kwargs):
         self.user = user
@@ -333,6 +362,10 @@ class TTPlantBatchHarvestCreateForm(ModelForm):
    class Meta:
       model = TT_Plant_Batch_Harvest
       fields = ['deleted','plant_batch','location','sublot','from_row','to_row','harvest_stage','harvest_completed','harvest_start_date','harvest_finish_date','external_id','harvest_id','biotrack_id','transaction_id','total_wet_weight','total_dry_weight','notes']
+      widgets = {
+            'harvest_start_date': DateInput(),
+            'harvest_finish_date': DateInput()
+        }
    
    def __init__(self, *args, user, **kwargs):
         self.user = user
@@ -379,7 +412,7 @@ class InvoiceModelCreateForm(ModelForm):
    
    class Meta:
       model = Invoice_Model
-      fields = ['invoice_name','inventory','accepted','buyer_location_license','invoice_id','location_license','refund_invoice_id','refunded','session_time','transaction_id','notes']
+      fields = ['invoice_name','inventory','accepted','buyer_location_license','invoice_id','location_license','refund_invoice_id','refunded','transaction_id','notes']
    
    def __init__(self, *args, user, **kwargs):
         self.user = user

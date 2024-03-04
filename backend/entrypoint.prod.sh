@@ -18,7 +18,7 @@ python manage.py migrate tracker
 echo "Tracker Migrations made"
 python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
 # You can put other setup logic here 
-echo "Superuser created!"
+#echo "Superuser created!"
 
 # Evaluating passed command:
 exec "$@"

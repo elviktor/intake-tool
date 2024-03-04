@@ -1,0 +1,38 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Detail Sheet -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">{{ tt_user_info }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-left">
+        <p><strong>User Info:</strong> {{ tt_user_info.company_name }}</p> 
+        <p><strong>OCM License:</strong> {{ tt_user_info.company_ocm_license }}</p> 
+        <p><strong>Contact First Name:</strong> {{ tt_user_info.contact_first_name }}</p>
+        <p><strong>Contact Last Name:</strong> {{ tt_user_info.contact_last_name }}</p>
+        <p><strong>Contact Email:</strong> {{ tt_user_info.contact_email }}</p>
+        <p><strong>Contact Phone:</strong> {{ tt_user_info.contact_phone }}</p>
+        <p><strong>Contact Website:</strong> {{ tt_user_info.contact_website }}</p>
+        <p><strong>Contact Address:</strong> {{ tt_user_info.contact_address }}</p>
+        <p><strong>Contact City:</strong> {{ tt_user_info.contact_city }}</p>
+        <p><strong>Contact State:</strong> {{ tt_user_info.contact_state }}</p>
+        <p><strong>Contact Zip:</strong> {{ tt_user_info.contact_zip }}</p>
+        
+        <p><strong>Notes:</strong> {{ tt_user_info.notes }}</p>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <p><a href="{% url 'home'%}">Back</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

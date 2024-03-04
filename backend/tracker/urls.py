@@ -41,6 +41,8 @@ urlpatterns = [
 
      path('forms/invoice_model_create_form/', views.invoice_model_create_form, name='invoice_model_create_form'),
 
+     path('forms/tt_location_create_form/', views.tt_user_info_create_form, name='tt_user_info_create_form'),
+
      path('forms/tt_location_create_form/', views.tt_location_create_form, name='tt_location_create_form'),
 
      path('forms/tt_sublot_create_form/', views.tt_sublot_create_form, name='tt_sublot_create_form'),
@@ -105,6 +107,10 @@ urlpatterns = [
     path('tt_inventory_product/create/', views.TTInventoryProductCreate.as_view(), name='tt_inventory_product_create'),
     path('tt_inventory_product/<int:pk>/update/', views.TTInventoryProductUpdate.as_view(), name='tt_inventory_product_update'),
     path('tt_inventory_product/<int:pk>/delete/', views.TTInventoryProductDelete.as_view(), name='tt_inventory_product_delete'),
+
+    path('tt_user_info/create/', views.TTUserInfoCreate.as_view(), name='tt_user_info_create'),
+    path('tt_user_info/<int:pk>/update/', views.TTUserInfoUpdate.as_view(), name='tt_user_info_update'),
+    path('tt_user_info/<int:pk>/delete/', views.TTUserInfoDelete.as_view(), name='tt_user_info_delete'),
 
     path('tt_location/create/', views.TTLocationCreate.as_view(), name='tt_location_create'),
     path('tt_location/<int:pk>/update/', views.TTLocationUpdate.as_view(), name='tt_location_update'),
