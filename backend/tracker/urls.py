@@ -3,14 +3,27 @@ from . import views, forms
 
 # Contents
 # ========
-# > TT Object Conversion Form Views
-# > Create Update Delete Template Views
-# > Detail Template Views
-# > List Template Views
+# > Report URLs
+# > Search URLS
+# > TT Object Conversion Form URLs
+# > Create Update Delete Template URLs
+# > Detail Template URLs
+# > List Template URLs
 
 
 urlpatterns = [ 
-    
+
+# Report URLs
+# ===========
+    path('ocm_bimonthly_inventory/report/', views.ocm_bimonthly_inventory_report, name='ocm_bimonthly_inventory_report'),
+
+
+# Search URLs
+#==============
+
+     path('tt_plant_batch_harvest/search/', views.tt_plant_batch_harvest_search, name='tt_plant_batch_harvest_search'),
+
+
 # TT Object Conversion Form URLs
 # ==============================
 
@@ -41,15 +54,25 @@ urlpatterns = [
 
      path('forms/invoice_model_create_form/', views.invoice_model_create_form, name='invoice_model_create_form'),
 
-     path('forms/tt_location_create_form/', views.tt_user_info_create_form, name='tt_user_info_create_form'),
+     path('forms/tt_user_info_form/', views.tt_user_info_create_form, name='tt_user_info_create_form'),
 
      path('forms/tt_location_create_form/', views.tt_location_create_form, name='tt_location_create_form'),
 
      path('forms/tt_sublot_create_form/', views.tt_sublot_create_form, name='tt_sublot_create_form'),
 
      path('forms/tt_plant_batch_create_form/', views.tt_plant_batch_create_form, name='tt_plant_batch_create_form'),
-     
+
      path('forms/tt_plant_batch_harvest_create_form/', views.tt_plant_batch_harvest_create_form, name='tt_plant_batch_harvest_create_form'),
+     
+     path('forms/manifest_driver_create_form/', views.manifest_driver_create_form,name='manifest_driver_create_form'),
+
+     path('forms/manifest_stop_create_form/', views.manifest_stop_create_form, name='manifest_stop_create_form'),
+
+     path('forms/manifest_vehicle_create_form/', views.manifest_vehicle_create_form, name='manifest_vehicle_create_form'),
+
+     path('forms/manifest_thirdpartytransporter_create_form/', views.manifest_thirdpartytransporter_create_form, name='manifest_thirdpartytransporter_create_form'),
+
+     path('forms/manifest_create_form/', views.manifest_create_form, name='manifest_create_form'),
 
 
 
@@ -85,11 +108,16 @@ urlpatterns = [
 
      path('forms/invoice_inventory_delete_form/', views.invoice_inventory_delete_form, name='invoice_inventory_delete_form'),
 
+     path('forms/manifest_driver_delete_form/', views.manifest_driver_delete_form,name='manifest_driver_delete_form'),
 
-# Search URLs
-#==============
+     path('forms/manifest_stop_delete_form/', views.manifest_stop_delete_form, name='manifest_stop_delete_form'),
 
-     path('tt_plant_batch_harvest/search/', views.TTPlantBatchHarvestSearch.as_view(), name='tt_plant_batch_harvest_search'),
+     path('forms/manifest_vehicle_delete_form/', views.manifest_vehicle_delete_form, name='manifest_vehicle_delete_form'),
+
+     path('forms/manifest_thirdpartytransporter_delete_form/', views.manifest_thirdpartytransporter_delete_form, name='manifest_thirdpartytransporter_delete_form'),
+
+     path('forms/manifest_delete_form/', views.manifest_delete_form, name='manifest_delete_form'),
+
 
 
 

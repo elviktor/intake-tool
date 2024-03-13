@@ -1,0 +1,499 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<!-- Header -->
+<div class="row spacer"></div>
+<!-- Report input and display page -->
+<section class="page-section" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2 class="section-heading text-uppercase">OCM Bimonthly Inventory Search</h2>
+      </div>
+    </div>
+    <!-- Date range entry form -->
+    <div class="row">
+      <div class="col-lg-12 text-right">
+        <form role="search" method="POST" action="{% url 'ocm_bimonthly_inventory_report' %}">
+          {% csrf_token %}
+          <label for="start_date">Search Range Start Date:</label>          
+          <input class="form-control me-2" type="date" placeholder="Start Date" name="start_date" required aria-label="Start Date">
+          <label for="end_date">Search Range End Date:</label>  
+          <input class="form-control me-2" type="date" placeholder="End Date" name="end_date" required aria-label="End Date">
+          <button class="mt-2 btn btn-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+    <!-- Question and answer displays -->
+    <div class="row">
+      <div class="mt-4 col-lg-12 text-left">
+
+        <!-- Question 01 vvv -->
+        <div class="report-question">
+          <h4>Question 01</h4>
+          <p>
+            <b>What inventory tracking system are you currently using?</b>
+          </p>
+          <p>
+            <span class="report-result">
+              Trichomes Consulting
+            </span>
+          </p>
+          
+        </div>
+        <!-- Question 01 ^^^ -->
+        
+        <!-- Question 02 vvv -->
+        <div class="report-question">
+          <h4>Question 02</h4>
+          <p>
+            <b>Did you minimally process flower products into final packaged units for retail sale during this inventory period?</b>
+          </p>
+          {% if total_quantity_q02 %}
+          <p>
+            <span class="report-result">
+              {{ message_q02 }} - Packaged {{ total_quantity_q02}} units
+            </span>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q02" aria-expanded="false" aria-controls="data_q02">
+              Question 02 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q02">
+            <div class="card card-body">
+              <h4>Product Batches</h4>
+              {% for batch in flower_batches_q02 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Name: {{batch.product_name}}</li>
+                  <li>Product Category: {{batch.product_category}}</li>
+                  <li>Packaging: {{batch.packaging}}</li>
+                  <li>Wholesale Price: {{batch.wholesale_price}}</li>
+                  <li>MSRP: {{batch.msrp}}</li>
+                  <li>Remaining Quantity: {{batch.remaining_quantity}}</li>
+                  <li>Remaining Weight: {{batch.remaining_weight}}</li>     
+                </ul>
+              </div>
+              {% endfor %}
+              {% for batch in pre_roll_batches_q02 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Name: {{batch.product_name}}</li>
+                  <li>Product Category: {{batch.product_category}}</li>
+                  <li>Packaging: {{batch.packaging}}</li>
+                  <li>Wholesale Price: {{batch.wholesale_price}}</li>
+                  <li>MSRP: {{batch.msrp}}</li>
+                  <li>Remaining Quantity: {{batch.remaining_quantity}}</li>
+                  <li>Remaining Weight: {{batch.remaining_weight}}</li>     
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>      
+        {% endif %}
+        </div>
+        <!-- Question 02 ^^^ -->
+
+
+
+        <!-- Question 03 vvv -->
+        <div class="report-question">
+          <h4>Question 03</h4>
+          <p>
+            <b>Did you distribute finished flower products to Dispensaries that were processed by a licensed Processor during this inventory period?</b>
+          </p>
+          {% if batches_q03 %}
+
+          <p>
+            <span class="report-result">
+              {{ message_q03 }}
+            </span>
+          </p>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q03" aria-expanded="false" aria-controls="data_q03">
+              Question 03 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q03">
+            <div class="card card-body">
+              <h4>Inventory Items</h4>
+              {% for batch in batches_q03 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Name: {{batch.stops.items.inventory_product.product_batch.product_name}}</li>
+                  <li>Category: {{batch.stops.items.inventory_product.product_batch.product_category}}</li>
+                  <li>Packaging: {{batch.stops.items.inventory_product.product_batch.packaging}}</li>
+                  <li>Wholesale price: {{batch.stops.items.inventory_product.product_batch.wholesale_price}}</li>
+                  <li>Items remaining in inventory: {{ batch.stops.items.inventory_product.remaining_quantity }}</li>
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>
+        
+        {% endif %}
+        </div>
+        <!-- Question 03 ^^^ -->
+
+
+        <!-- Question 04 vvv -->
+        <div class="report-question">
+          <h4>Question 04</h4>
+          <p>
+            <b>Do you have packaging onsite for flower that can be used for retail sale?</b>
+          </p>
+          <p>
+            <span class="report-result">
+              Please check your site map
+            </span>
+          </p>
+          
+        </div>
+        <!-- Question 04 ^^^ -->
+
+
+        <!-- Question 05 vvv -->
+        <div class="report-question">
+          <h4>Question 05</h4>
+          <p>
+            <b>Products distributed to Dispensaries this inventory period</b>
+          </p>
+          {% if total_quantity_q05 %}
+          <p>
+            <span class="report-result">
+              {{ total_quantity_q05 }} Products
+            </span>
+          </p>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q05" aria-expanded="false" aria-controls="data_q05">
+              Question 05 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q05">
+            <div class="card card-body">
+              <h4>Inventory Items</h4>
+              {% for batch in batches_q05 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Name: {{batch.stops.items.inventory_product.product_batch.product_name}}</li>
+                  <li>Category: {{batch.stops.items.inventory_product.product_batch.product_category}}</li>
+                  <li>Packaging: {{batch.stops.items.inventory_product.product_batch.packaging}}</li>
+                  <li>Wholesale price: {{batch.stops.items.inventory_product.product_batch.wholesale_price}}</li>
+                  <li>Items remaining in inventory: {{ batch.stops.items.inventory_product.remaining_quantity }}</li>
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>
+        
+        {% endif %}
+        </div>
+        <!-- Question 05 ^^^ -->
+
+
+        <!-- Question 06 vvv -->
+        <div class="report-question">
+          <h4>Question 06</h4>
+          <p><b>DRY weight in pounds (lbs)</b></p>
+
+          <!-- Question 06a vvv -->
+          <div class="mt-4 report_subquestion">
+            <p>
+              Bulk flower transferred to Cultivators
+            </p>
+            {% if total_weight_q06a %}
+
+            <p>
+              <span class="report-result">
+                {{ total_weight_q06a }} Pounds (lbs)
+              </span>
+            </p>
+            <p>
+              <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q06a" aria-expanded="false" aria-controls="data_q06a">
+                Question 06 Data - To Cultivators
+              </a>
+            </p>
+            <div class="collapse" id="data_q06a">
+              <div class="card card-body">
+                <h4>Manifest Inventory</h4>
+                {% for batch in batches_q06a %}
+                <div class="mt-2 report_data">
+                  <ul class="no-bullets">
+                    <li><b>Quantity: {{ batch.stops.items.quantity }}</b></li>
+                    <li><b>Weight: {{ batch.stops.items.weight }}</b></li>
+                  </ul>
+                  <p>Description: {{ batch.stops.items.description }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <p>No results found.</p>
+          
+          {% endif %}
+          </div>
+          <!-- Question 06a ^^^ -->
+
+          <!-- Question 06b vvv -->
+          <div class="mt-4 report_subquestion">
+            <p>
+              <b>Bulk flower transferred to Processors</b>
+            </p>
+            {% if total_weight_q06b %}
+
+            <p>
+              <span class="report-result">
+                {{ total_weight_q06b }} Pounds (lbs)
+              </span>
+            </p>
+            <p>
+              <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q06b" aria-expanded="false" aria-controls="data_q06b">
+                Question 06 Data - To Processors
+              </a>
+            </p>
+            <div class="collapse" id="data_q06b">
+              <div class="card card-body">
+                <h4>Manifest Inventory</h4>
+                {% for batch in batches_q06b %}
+                <div class="mt-2 report_data">
+                  <ul class="no-bullets">
+                    <li><b>Quantity: {{ batch.stops.items.quantity }}</b></li>
+                    <li><b>Weight: {{ batch.stops.items.weight }}</b></li>
+                  </ul>
+                  <p>Description: {{ batch.stops.items.description }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <p>No results found.</p>
+          
+          {% endif %}
+          </div>
+          <!-- Question 06b ^^^ -->
+          
+        </div>
+        <!-- Question 06 ^^^ -->
+        
+
+        <!-- Question 07 vvv -->
+        <div class="report-question">
+          <h4>Question 07</h4>
+          <p><b>WET weight in pounds (lbs)</b></p>
+
+          <!-- Question 07a vvv -->
+          <div class="mt-4 report_subquestion">
+            <p>
+              <b>Fresh or frozen flower transferred to Cultivators</b>
+            </p>
+            {% if total_weight_q07a %}
+
+            <p>
+              <span class="report-result">
+                {{ total_weight_q07a }} Pounds (lbs)
+              </span>
+            </p>
+            <p>
+              <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q07a" aria-expanded="false" aria-controls="data_q07a">
+                Question 07 Data - To Cultivators
+              </a>
+            </p>
+            <div class="collapse" id="data_q07a">
+              <div class="card card-body">
+                <h4>Manifest Inventory</h4>
+                {% for batch in batches_q07a %}
+                <div class="mt-2 report_data">
+                  <ul class="no-bullets">
+                    <li><b>Name: {{ batch.stops.items.inventory_product.product_batch.product_name }}</b></li>
+                    <li><b>Category: {{ batch.stops.items.inventory_product.product_batch.product_category }}</b></li>
+                    <li><b>Strain: {{ batch.stops.items.inventory_product.product_batch.harvest_batch.plant_batch.strain }}</b></li>
+                    <li><b>Quantity: {{ batch.stops.items.quantity }}</b></li>
+                    <li><b>Weight: {{ batch.stops.items.weight }}</b></li>
+                    <li><b>Description: {{ batch.stops.items.description }}</b></li>
+                  </ul>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <p>No results found.</p>
+          
+          {% endif %}
+          </div>
+          <!-- Question 07a ^^^ -->
+
+          <!-- Question 07b vvv -->
+          <div class="mt-4 report_subquestion">
+            <p>
+              <b>Fresh or frozen flower transferred to Processors</b>
+            </p>
+            {% if total_weight_q07b %}
+
+            <p>
+              <span class="report-result">
+                {{ total_weight_q07b }} Pounds (lbs)
+              </span>
+            </p>
+            <p>
+              <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q07b" aria-expanded="false" aria-controls="data_q07b">
+                Question 07 Data - To Processors
+              </a>
+            </p>
+            <div class="collapse" id="data_q07b">
+              <div class="card card-body">
+                <h4>Manifest Inventory</h4>
+                {% for batch in batches_q07b %}
+                <div class="mt-2 report_data">
+                  <ul class="no-bullets">
+                    <li><b>Quantity: {{ batch.stops.items.quantity }}</b></li>
+                    <li><b>Weight: {{ batch.stops.items.weight }}</b></li>
+                  </ul>
+                  <p>Description: {{ batch.stops.items.description }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <p>No results found.</p>
+          
+          {% endif %}
+          </div>
+          <!-- Question 07b ^^^ -->
+          
+        </div>
+        <!-- Question 07 ^^^ -->
+
+        <!-- Question 08 vvv -->
+        <div class="report-question">
+          <h4>Question 08</h4>
+          <p>
+            <b>Biomass Cannabis (dry) on hand close of inventory period</b>
+          </p>
+          {% if total_weight_q08 %}
+
+          <p>
+            <span class="report-result">
+              {{ total_weight_q08 }} Pounds (lbs)
+            </span>
+          </p>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q08" aria-expanded="false" aria-controls="data_q08">
+              Question 08 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q08">
+            <div class="card card-body">
+              <h4>Storage Batches</h4>
+              {% for batch in batches_q08 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Location Date: {{ batch.location_date }}</li>
+                  <li>Strain: {{ batch.harvest_batch.plant_batch.strain }}</li>
+                  <li>Wet/Dry: {{ batch.wet_dry }}</li>
+                  <li>Category: {{ batch.produce_category }}</li>
+                  <li><b>Weight: {{ batch.weight }}</b></li>
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>
+        {% endif %}
+        </div>
+        <!-- Question 08 ^^^ -->
+
+
+        <!-- Question 09 vvv -->
+        <div class="report-question">
+          <h4>Question 09</h4>
+          <p>
+            <b>Fresh Cannabis (wet) on hand close of inventory period</b>
+          </p>
+          {% if total_weight_q09 %}
+
+          <p>
+            <span class="report-result">
+              {{ total_weight_q09 }} Pounds (lbs)
+            </span>
+          </p>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q09" aria-expanded="false" aria-controls="data_q09">
+              Question 09 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q09">
+            <div class="card card-body">
+              <h4>Storage Batches</h4>
+              {% for batch in batches_q09 %}
+              <div class="mt-2 report_data">
+                <ul class="no-bullets">
+                  <li>Location Date: {{ batch.location_date }}</li>
+                  <li>Strain: {{ batch.harvest_batch.plant_batch.strain }}</li>
+                  <li>Wet/Dry: {{ batch.wet_dry }}</li>
+                  <li>Category: {{ batch.produce_category }}</li>
+                  <li><b>Weight: {{ batch.weight }}</b></li>
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>
+          {% endif %}
+        </div>
+        
+        <!-- Question 09 ^^^ -->
+
+        <!-- Question 10 vvv -->
+        <div class="report-question">
+          <h4>Question 10</h4>
+          <p>
+            <b>Frozen Cannabis (wet) on hand close of inventory period</b>
+          </p>
+          {% if total_weight_q10 %}
+
+          <p>
+            <span class="report-result">
+              {{ total_weight_q10 }} Pounds (lbs)
+            </span>
+          </p>
+          <p>
+            <a class="btn btn-info" role="button" data-bs-toggle="collapse" data-bs-target="#data_q10" aria-expanded="false" aria-controls="data_q10">
+              Question 10 Data
+            </a>
+          </p>
+          <div class="collapse" id="data_q10">
+            <div class="card card-body">
+              <h4>Storage Batches</h4>
+              <div class="mt-2 report_data">
+              {% for batch in batches_q10 %}
+                <ul class="no-bullets">
+                  <li>Location Date: {{ batch.location_date }}</li>
+                  <li>Strain: {{ batch.harvest_batch.plant_batch.strain }}</li>
+                  <li>Wet/Dry: {{ batch.wet_dry }}</li>
+                  <li>Category: {{ batch.produce_category }}</li>
+                  <li><b>Weight: {{ batch.weight }}</b></li>
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <p>No results found.</p>
+          {% endif %}
+        </div>
+        <!-- Question 10 ^^^ -->
+
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

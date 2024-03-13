@@ -1,3 +1,26 @@
+/* Lists */
+.no-bullets {
+    list-style-type: none;
+    padding: 1em;
+  }
+
+/* Reports */
+
+.report-question {
+    margin-top: 2em;
+    padding: 1em;
+    background: #dee2e6 !important;
+    border-radius: 10px;
+}
+
+.report-result {
+    border-radius: 5px;
+    border: 2px solid #5cb85c;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+
 /* Dashboard */
 .ct-area {
     fill-opacity: .33 !important;

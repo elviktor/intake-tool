@@ -165,6 +165,7 @@
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{% url 'tt_plant_batch_harvest_create_form' %}">Create Batch</a></li>
+                                <li><a href="{% url 'tt_plant_batch_harvest_search' %}">Search</a></li>
                                 <li><a href="{% url 'tt_plant_batch_harvest_delete_form' %}">Delete</a></li>
                             </ul>
                         </li>
@@ -231,19 +232,33 @@
                                 <li><a href="{% url 'tt_inventory_to_invoice_item_form' %}">Add Product</a></li>
                                 <li><a href="{% url 'invoice_model_delete_form' %}">Delete</a></li>
                             </ul>
-                        </li>                    
+                        </li>    
+                        
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="bi bi-file-ruled"></i>
+
+                                <span>Transport Manifests</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'tt_inventory_to_stop_item_form' %}">Create Stop Item</a></li>
+                                <li><a href="{% url 'manifest_stop_create_form' %}">Add Manifest Stop</a></li>
+                                <li><a href="{% url 'manifest_driver_create_form' %}">Add Driver</a></li>
+                                <li><a href="{% url 'manifest_vehicle_create_form' %}">Add Vehicle</a></li>
+                                <li><a href="{% url 'manifest_thirdpartytransporter_create_form' %}">Add 3rd Party Transporter</a></li>
+                                <li><a href="{% url 'manifest_create_form' %}">Add Manifest</a></li>
+                                <li><a href="{% url 'manifest_delete_form' %}">Delete</a></li>
+                            </ul>
+                        </li>   
 
                         <li class="menu-title">Reporting</li>
 
                         <li>
-                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <a href="{% url 'ocm_bimonthly_inventory_report' %}" class="">
                                 <i class="bi bi-file-bar-graph"></i>
 
-                                <span>OCM Monthly Report</span>
+                                <span>OCM Bi-Monthly Inventory Report</span>
                             </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{% url 'home' %}">View</a></li>
-                            </ul>
                         </li>
 
                         

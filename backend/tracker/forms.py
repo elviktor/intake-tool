@@ -1,14 +1,17 @@
 from django import forms
 from django.forms.models import ModelForm
 from django.forms import inlineformset_factory
-from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info
+from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info, Manifest_Driver, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Delete
 
-# Date Widget
+# Date and Time Widgets
 class DateInput(forms.DateInput):
     input_type = 'date'
 
 class DateTimeInput(forms.DateTimeInput):
    input_type = 'datetime'
+
+class TimeInput(forms.TimeInput):
+   input_type = 'time'
 
 
 class TTHarvestToStorageForm(ModelForm):
@@ -87,7 +90,7 @@ TTStorageToProductFormsetD = inlineformset_factory(
 class TTProductToLabSampleForm(ModelForm):
    class Meta:
       model = TT_Lab_Sample
-      fields = ['sample_name','product_batch','active','location','sublot','from_row','to_row','amount','amount_used','quantity','biotrack_id','inventory_id','inventory_type','lab_license','location_license','medical_grade','parent_id','result','results','rn_d','sample_use','test_results','transaction_id','notes']
+      fields = ['sample_name','product_batch','active','location','sublot','from_row','to_row','amount','amount_used','quantity','inventory_id','inventory_type','lab_license','location_license','medical_grade','parent_id','result','results','rn_d','sample_use','test_results','notes']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -144,7 +147,7 @@ TTProductToLabSampleFormsetE = inlineformset_factory(
 class TTProductToInventoryForm(ModelForm):
    class Meta:
       model = TT_Inventory_Product
-      fields = ['inventory','product_batch','qa_status','total_quantity','remaining_quantity','total_amount','remaining_amount','unit_based','usable_weight','rec_usable_weight','med_usable_weight','medicated','seized','status','transaction_id','notes']
+      fields = ['inventory','product_batch','qa_status','total_quantity','total_amount','unit_based','usable_weight','rec_usable_weight','med_usable_weight','medicated','seized','status','notes']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -183,10 +186,11 @@ TTProductToInventoryFormsetA = inlineformset_factory(
 TTProductToInventoryFormsetB = inlineformset_factory(
     TT_Product_Batch, TT_Inventory_Product, form=TTProductToInventoryForm, fields=('product_batch',), can_delete=True, extra=0)
 
+# Used instead of a StopItemCreateForm
 class TTInventoryToStopItemForm(ModelForm):
    class Meta:
       model = Stop_Item
-      fields = ['inventory_product','description','biotrack_id','inventory_id','manifest_id','quantity','quantity_received','stop_number','transaction_id','weight']
+      fields = ['stop_number','inventory_product','description','quantity_received','weight']
    
    def __init__(self, *args, user, **kwargs):
        self.user = user
@@ -225,7 +229,7 @@ TTInventoryToStopItemFormsetA = inlineformset_factory(
 class TTInventoryToInvoiceItemForm(ModelForm):
    class Meta:
       model = Invoice_Inventory
-      fields = ['invoice_model','inventory_product','product_name','amount','price','biotrack_id','inventory_id','invoice_id','transaction_id','uom']
+      fields = ['invoice_model','inventory_product','product_name','amount','price','inventory_id','uom']
    
    def __init__(self, *args, user, **kwargs):
       self.user = user
@@ -282,7 +286,7 @@ class LabResultCreateForm(ModelForm):
 class LabSampleResultCreateForm(ModelForm):
    class Meta:
       model = Lab_Sample_Result
-      fields = ['sample_name','biotrack_id','lab_provided','sample_id','test_id','test_panel','test_pass','test_value','transaction_id']
+      fields = ['sample_name','lab_provided','sample_id','test_id','test_panel','test_pass','test_value','transaction_id']
    
    def __init__(self, *args, user, **kwargs):
       self.user = user
@@ -302,7 +306,7 @@ class TTUserInfoCreateForm(ModelForm):
 class TTLocationCreateForm(ModelForm):
    class Meta:
       model = TT_Location
-      fields = ['name','external_id','biotrack_id','location_license','quarantine','transaction_id','notes']
+      fields = ['name','external_id','location_license','quarantine','notes']
    
    def __init__(self, *args, user, **kwargs):
       self.user = user
@@ -313,7 +317,7 @@ class TTSublotCreateForm(ModelForm):
    
    class Meta:
       model = TT_Sublot
-      fields = ['sublot_name','location','amount','external_id','location_license','transaction_id','uom','notes']
+      fields = ['sublot_name','location','rows','amount','external_id','location_license','uom','notes']
    
    def __init__(self, *args, user, **kwargs):
         self.user = user
@@ -331,7 +335,7 @@ class TTPlantBatchCreateForm(ModelForm):
    
    class Meta:
       model = TT_Plant_Batch
-      fields = ['birth_date','strain','quantity','location','sublot','from_row','to_row','mother','org_id','parent_id','room_id','converted','destroy_reason','destroy_reason_id','destroy_scheduled','destroy_scheduled_time','external_id','harvest_scheduled','state','transaction_id','notes']
+      fields = ['birth_date','strain','quantity','location','sublot','from_row','to_row','mother','org_id','parent_id','converted','destroy_reason','destroy_scheduled','destroy_scheduled_time','harvest_scheduled','notes']
       widgets = {
             'birth_date': DateInput(),
             'destroy_scheduled_time': DateInput(),
@@ -361,7 +365,7 @@ class TTPlantBatchHarvestCreateForm(ModelForm):
    
    class Meta:
       model = TT_Plant_Batch_Harvest
-      fields = ['deleted','plant_batch','location','sublot','from_row','to_row','harvest_stage','harvest_completed','harvest_start_date','harvest_finish_date','external_id','harvest_id','biotrack_id','transaction_id','total_wet_weight','total_dry_weight','notes']
+      fields = ['deleted','plant_batch','location','sublot','from_row','to_row','harvest_stage','harvest_completed','harvest_start_date','harvest_finish_date','total_wet_weight','total_dry_weight','notes']
       widgets = {
             'harvest_start_date': DateInput(),
             'harvest_finish_date': DateInput()
@@ -391,7 +395,7 @@ class TTInventoryCreateForm(ModelForm):
    
    class Meta:
       model = TT_Inventory
-      fields = ['inventory_name','inventory_type','location','sublot','from_row','to_row','external_id','biotrack_id','id_serial','location_license','notes']
+      fields = ['inventory_name','inventory_type','location','sublot','from_row','to_row','external_id','id_serial','location_license','notes']
    
    def __init__(self, *args, user, **kwargs):
         self.user = user
@@ -412,7 +416,7 @@ class InvoiceModelCreateForm(ModelForm):
    
    class Meta:
       model = Invoice_Model
-      fields = ['invoice_name','inventory','accepted','buyer_location_license','invoice_id','location_license','refund_invoice_id','refunded','transaction_id','notes']
+      fields = ['invoice_name','inventory','accepted','buyer_location_license','location_license','refund_invoice_id','refunded','notes']
    
    def __init__(self, *args, user, **kwargs):
         self.user = user
@@ -423,6 +427,118 @@ class InvoiceModelCreateForm(ModelForm):
 
 InvoiceModelCreateFormsetA = inlineformset_factory(
     TT_Inventory, Invoice_Model, form=InvoiceModelCreateForm, fields=('inventory',), can_delete=True, extra=0)
+
+
+class ManifestDriverCreateForm(ModelForm):
+   
+   class Meta:
+      model = Manifest_Driver
+      fields = ['dateof_birth','name','notes']
+      widgets = {
+            'dateof_birth': DateInput(),
+        }
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        
+
+class StopItemCreateForm(ModelForm):
+   
+   class Meta:
+      model = Stop_Item
+      fields = ['inventory_product','description','inventory_id','manifest_id','quantity','quantity_received','stop_number','weight','notes']
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['inventory_product'].queryset = TT_Inventory_Product.objects.filter(user=self.user)
+
+   inventory_product = forms.ModelChoiceField(queryset=TT_Inventory_Product.objects.all(), empty_label="Select an inventory product...")
+
+StopItemCreateFormsetA = inlineformset_factory(
+    TT_Inventory_Product, Stop_Item, form=StopItemCreateForm, fields=('inventory_product',), can_delete=True, extra=0)
+
+
+class ManifestStopCreateForm(ModelForm):
+   
+   class Meta:
+      model = Manifest_Stop
+      fields = ['stop_name','stop_number','items','approximate_departure','approximate_arrival','approximate_route','driver_arrived','driver_arrived_time','invoice','biotrack_invoice_id','location_license','manifest_id','notes']
+      widgets = {
+            'approximate_arrival': DateInput(),
+            'approximate_departure': DateInput(),
+            'driver_arrived_time': TimeInput()
+        }
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['items'].queryset = Stop_Item.objects.filter(user=self.user)
+        self.fields['invoice'].queryset = Invoice_Model.objects.filter(user=self.user)
+
+   items = forms.ModelChoiceField(queryset=Stop_Item.objects.all(), empty_label="Select a stop item...")
+
+ManifestStopCreateFormsetA = inlineformset_factory(
+    Stop_Item, Manifest_Stop, form=ManifestStopCreateForm, fields=('items',), can_delete=True, extra=0)
+ManifestStopCreateFormsetB = inlineformset_factory(
+    Invoice_Model, Manifest_Stop, form=ManifestStopCreateForm, fields=('invoice',), can_delete=True, extra=0)
+
+
+class ManifestVehicleCreateForm(ModelForm):
+   
+   class Meta:
+      model = Manifest_Vehicle
+      fields = ['description','vehicle_name','notes']
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+       
+
+class ManifestThirdPartyTransporterCreateForm(ModelForm):
+   
+   class Meta:
+      model = Manifest_ThirdPartyTransporter
+      fields = ['license_number', 'name', 'notes']
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+
+class ManifestCreateForm(ModelForm):
+   
+   class Meta:
+      model = Manifest
+      fields = ['manifest_name','destination_category','stops','stop_count','total_item_count','type','name','phone','street','city','state','zip','drivers','vehicle','third_party_transporter','created_on','completed','completion_date','driver_arrived','in_transit','is_accepted','is_parked','received','updated_on','notes']
+      widgets = {
+            'created_on': DateInput(),
+        }
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['stops'].queryset = Manifest_Stop.objects.filter(user=self.user)
+        self.fields['drivers'].queryset = Manifest_Driver.objects.filter(user=self.user)
+        self.fields['third_party_transporter'].queryset = Manifest_ThirdPartyTransporter.objects.filter(user=self.user)
+        self.fields['vehicle'].queryset = Manifest_Vehicle.objects.filter(user=self.user)
+
+   stops = forms.ModelChoiceField(queryset=Manifest_Stop.objects.all(), empty_label="Select a stop...")
+   drivers = forms.ModelChoiceField(queryset=Manifest_Driver.objects.all(), empty_label="Select a driver...")
+   third_party_transporter = forms.ModelChoiceField(queryset=Manifest_ThirdPartyTransporter.objects.all(), empty_label="Select a third party transporter...") 
+   vehicle = forms.ModelChoiceField(queryset=Manifest_Vehicle.objects.all(), empty_label="Select a vehicle...") 
+   
+
+ManifestCreateFormsetA = inlineformset_factory(
+    Manifest_Stop, Manifest, form=ManifestCreateForm, fields=('stops',), can_delete=True, extra=0)
+ManifestCreateFormsetB = inlineformset_factory(
+    Manifest_Driver, Manifest, form=ManifestCreateForm, fields=('drivers',), can_delete=True, extra=0)
+ManifestCreateFormsetC = inlineformset_factory(
+    Manifest_ThirdPartyTransporter, Manifest, form=ManifestCreateForm, fields=('third_party_transporter',), can_delete=True, extra=0)
+ManifestCreateFormsetD = inlineformset_factory(
+    Manifest_Vehicle, Manifest, form=ManifestCreateForm, fields=('vehicle',), can_delete=True, extra=0)
+
 
 
 # Delete Forms
@@ -775,5 +891,130 @@ class InvoiceInventoryDeleteForm(ModelForm):
 
 InvoiceInventoryDeleteFormsetA = inlineformset_factory(
     Invoice_Inventory, Invoice_Inventory_Delete, form=InvoiceInventoryDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class ManifestDriverDeleteForm(ModelForm):
+      class Meta:
+         model = Manifest_Driver_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Manifest_Driver.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Manifest_Driver.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Manifest_Driver.objects.all(), empty_label="Select a batch to delete...")
+
+ManifestDriverDeleteFormsetA = inlineformset_factory(
+    Manifest_Driver, Manifest_Driver_Delete, form=ManifestDriverDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+class ManifestStopDeleteForm(ModelForm):
+      class Meta:
+         model = Manifest_Stop_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Manifest_Stop.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Manifest_Stop.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Manifest_Stop.objects.all(), empty_label="Select a batch to delete...")
+
+ManifestStopDeleteFormsetA = inlineformset_factory(
+    Manifest_Stop, Manifest_Stop_Delete, form=ManifestStopDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class ManifestVehicleDeleteForm(ModelForm):
+      class Meta:
+         model = Manifest_Vehicle_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Manifest_Vehicle.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Manifest_Vehicle.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Manifest_Vehicle.objects.all(), empty_label="Select a batch to delete...")
+
+ManifestVehicleDeleteFormsetA = inlineformset_factory(
+    Manifest_Vehicle, Manifest_Vehicle_Delete, form=ManifestVehicleDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class ManifestThirdPartyTransporterDeleteForm(ModelForm):
+      class Meta:
+         model = Manifest_ThirdPartyTransporter_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Manifest_ThirdPartyTransporter.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Manifest_ThirdPartyTransporter.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Manifest_ThirdPartyTransporter.objects.all(), empty_label="Select a batch to delete...")
+
+ManifestThirdPartyTransporterDeleteFormsetA = inlineformset_factory(
+    Manifest_ThirdPartyTransporter, Manifest_ThirdPartyTransporter_Delete, form=ManifestThirdPartyTransporterDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
+
+class ManifestDeleteForm(ModelForm):
+      class Meta:
+         model = Manifest_Delete
+         fields = ['deleted_item','notes']
+      
+      def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['deleted_item'].queryset = Manifest.objects.filter(user=self.user)
+
+      def check_deleted(self):
+         deleted = self.instance.Manifest.deleted
+
+         # Ensure that selected item has not already been deleted
+         if deleted == True:
+            raise forms.ValidationError("Item already deleted.")
+
+         else: pass
+      
+      deleted_item = forms.ModelChoiceField(queryset=Manifest.objects.all(), empty_label="Select a batch to delete...")
+
+ManifestDeleteFormsetA = inlineformset_factory(
+    Manifest, Manifest_Delete, form=ManifestDeleteForm, fields=('deleted_item',), can_delete=True, extra=0)
+
 
 

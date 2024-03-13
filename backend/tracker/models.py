@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.db import models
 import uuid
 from accounts.models import CustomUser
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 
 class Book(models.Model):
@@ -59,7 +60,7 @@ class Strain(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    name = models.CharField(max_length=250, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=False)
     shortname = models.CharField(max_length=250, null=True, blank=True)
     source = models.CharField(max_length=250, null=True, blank=True)
     type = models.CharField(max_length=250, null=True, blank=True)
@@ -67,7 +68,7 @@ class Strain(models.Model):
     coa_link = models.CharField(max_length=250, null=True, blank=True)
     thc_amt = models.FloatField(null=True, blank=True)
     cbd_amt = models.FloatField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -87,7 +88,7 @@ class Plant(models.Model):
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
     destroy_scheduled = models.BooleanField(default=False)
-    destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
+    destroy_scheduled_time = models.DateField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     harvest_scheduled = models.BooleanField(default=False)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
@@ -96,7 +97,7 @@ class Plant(models.Model):
     org_id = models.IntegerField(null=True, blank=True)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     room_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     state = models.CharField(max_length=250, null=True, blank=True)
     strain = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
@@ -116,7 +117,7 @@ class Weight(models.Model):
     amount = models.FloatField(null=True, blank=True)
     uom = models.CharField(max_length=250, null=True, blank=True)
     strain = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.strain
@@ -137,7 +138,7 @@ class Derivative(models.Model):
     transaction_id = models.IntegerField(null=True, blank=True)
     weight = models.FloatField(null=True, blank=True)
     whole_weight = models.FloatField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return str(self.biotrack_id)
@@ -152,7 +153,7 @@ class Plant_Harvest(models.Model):
     harvest_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.harvest_id
@@ -168,7 +169,7 @@ class Lab_Result(models.Model):
     test = models.IntegerField(null=True, blank=True)
     uom = models.CharField(max_length=250, null=True, blank=True)
     value = models.FloatField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return str(self.name)
@@ -187,7 +188,7 @@ class Lab_Sample_Result(models.Model):
     test_pass = models.BooleanField(default=False)
     test_value = models.FloatField(null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
@@ -215,7 +216,7 @@ class Lab_Sample(models.Model):
     results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
     rn_d = models.BooleanField(default=False)
     sample_use = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     test_results = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
     transaction_id = models.IntegerField(null=True, blank=True)
 
@@ -241,7 +242,7 @@ class Inventory(models.Model):
     rec_usable_weight = models.FloatField(null=True, blank=True)
     remaining_amount = models.FloatField(null=True, blank=True)
     seized = models.BooleanField(default=False)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=250, null=True, blank=True)
     strain = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
@@ -262,7 +263,7 @@ class Inventory_Room(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
     quarantine = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -278,7 +279,7 @@ class Inventory_Sublot(models.Model):
     location_license = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     uom = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.sublot_name
@@ -291,7 +292,7 @@ class Inventory_Move(models.Model):
     inventory_ids = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     new_room_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.inventory_ids
@@ -306,7 +307,7 @@ class Plant_Cure(models.Model):
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.cure_id
@@ -323,7 +324,7 @@ class Grow_Room(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     updated_on = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -337,7 +338,7 @@ class TT_User_Info(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    company_name = models.CharField(max_length=250, null=True, blank=True)
+    company_name = models.CharField(max_length=250, null=True, blank=False)
     company_ocm_license = models.CharField(max_length=250, null=True, blank=True)
     contact_first_name = models.CharField(max_length=250, null=True, blank=True)
     contact_last_name = models.CharField(max_length=250, null=True, blank=True)
@@ -362,13 +363,13 @@ class TT_Location(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    name = models.CharField(max_length=250, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=False)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     location_license = models.CharField(max_length=250, null=True, blank=True)
     quarantine = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -383,14 +384,15 @@ class TT_Sublot(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    sublot_name = models.CharField(max_length=250, null=True, blank=True)
+    sublot_name = models.CharField(max_length=250, null=True, blank=False)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
+    rows = models.IntegerField(null=True,blank=True)
     amount = models.FloatField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     uom = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -405,9 +407,9 @@ class TT_Plant_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    birth_date = models.DateField(null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=False)
     strain = models.ForeignKey(Strain, on_delete=models.CASCADE)
-    quantity = models.IntegerField(null=True, blank=True) #Use qty to bulk_create() Biotrack plant models
+    quantity = models.IntegerField(null=True, blank=False) #Use qty to bulk_create() Biotrack plant models
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     from_row = models.IntegerField(null=True, blank=True)
@@ -420,10 +422,10 @@ class TT_Plant_Batch(models.Model):
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
     destroy_scheduled = models.BooleanField(default=False)
-    destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
+    destroy_scheduled_time = models.DateField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     harvest_scheduled = models.BooleanField(default=False)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     state = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
@@ -447,20 +449,20 @@ class TT_Plant_Batch_Harvest(models.Model):
     to_row = models.IntegerField(null=True, blank=True)
     harvest_stage = models.CharField(max_length=250, null=True, blank=True)
     harvest_completed = models.BooleanField(default=False)
-    harvest_start_date = models.DateField(null=True, blank=True)
+    harvest_start_date = models.DateField(null=True, blank=False)
     harvest_finish_date = models.DateField(null=True, blank=True)
     external_id = models.CharField(max_length=250, null=True, blank=True)
     harvest_id = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     transaction_id = models.IntegerField(null=True, blank=True)
-    total_wet_weight = models.FloatField(null=True, blank=True)
-    total_dry_weight = models.FloatField(null=True, blank=True)
+    total_wet_weight = models.FloatField(null=True, blank=False)
+    total_dry_weight = models.FloatField(null=True, blank=False)
     # The following "remaining weights" are key for tracking product amounts
     # It is what can be submitted to OCM. They interact with the following models:
     # TT_Product_Batch, 
     remaining_wet_weight = models.FloatField(null=True, blank=True) 
     remaining_dry_weight = models.FloatField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -476,13 +478,14 @@ class TT_Storage_Batch(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
-    package_number = models.IntegerField(null=True, blank=True)
+    package_number = models.IntegerField(null=True, blank=False)
     location_date = models.DateField(null=True, blank=True)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     from_row = models.IntegerField(null=True, blank=True)
     to_row = models.IntegerField(null=True, blank=True)
     # Select if product uses WET (fresh frozen) or DRY (flower) cannabis
+    # OCM's 'fresh flower' term = (wet_dry=wet) + (produce_category=flower)
     WETDRY = (
         ('wet', 'wet'),
         ('dry', 'dry'),
@@ -491,12 +494,12 @@ class TT_Storage_Batch(models.Model):
     wet_dry = models.CharField(
         max_length=3,
         choices=WETDRY,
-        blank=True,
+        blank=False,
         default='wet',
     )
 
     PRODUCECAT = (
-        ('flower', 'flower'),
+        ('flower', 'flower'),  
         ('kief', 'kief'),
         ('shake', 'shake'),
         ('trim', 'trim'),
@@ -508,25 +511,39 @@ class TT_Storage_Batch(models.Model):
     produce_category = models.CharField(
         max_length=10,
         choices=PRODUCECAT,
-        blank=True,
+        blank=False,
         default='flower',
     )
-
 
     # Update cannabis amounts still on hand. 
     # If TT_Storage_Batch.wet_dry = "wet":
     #     TT_Plant_Batch_Harvest.remaining_wet_weight = TT_Plant_Batch_Harvest.remaining_wet_weight - TT_Storage_Batch.weight
     # If TT_Storage_Batch.wet_dry = "dry":
     #     TT_Plant_Batch_Harvest.remaining_dry_weight = TT_Plant_Batch_Harvest.remaining_dry_weight - TT_Storage_Batch.weight
-    weight = models.FloatField(null=True, blank=True)
+    weight = models.FloatField(null=True, blank=False)
     # Status examples: in storage, sent to processor, converted to product batch, destroyed
-    status = models.CharField(max_length=250, null=True, blank=True)
+
+    STATUS = (
+        ('in storage','in storage'),
+        ('to processor','to processor'),
+        ('to product','to product'),
+        ('destroyed','destroyed'),
+        ('other','other'),
+    )
+
+    status = models.CharField(
+        max_length=25,
+        choices=STATUS, 
+        blank=False,
+        default='in storage',
+    )
+
     converted = models.BooleanField(default=False)
     destroy_reason = models.CharField(max_length=250, null=True, blank=True)
     destroy_reason_id = models.IntegerField(null=True, blank=True)
     destroy_scheduled = models.BooleanField(default=False)
-    destroy_scheduled_time = models.DateTimeField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    destroy_scheduled_time = models.DateField(null=True, blank=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -541,8 +558,26 @@ class TT_Product_Batch(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    product_name = models.CharField(max_length=250, null=True, blank=True)
-    product_category = models.CharField(max_length=250, null=True, blank=True)
+    product_name = models.CharField(max_length=250, null=True, blank=False)
+    
+    PRODUCTCAT = (
+        ('flower', 'flower'), 
+        ('pre roll','pre roll'),
+        ('edible','edible'),
+        # For now 'processed' is the catch all for diverse
+        # processed cannabis products like wax, shatter....
+        ('processed','processed'),
+        ('bulk flower-dry','bulk flower-dry'),('bulk flower-wet','bulk flower-wet'),('frozen flower-wet','frozen flower-wet'),('biomass','biomass'),
+        ('other','other'),
+    )
+
+    product_category = models.CharField(
+        max_length=25,
+        choices=PRODUCTCAT,
+        blank=True,
+        default='flower',
+    )
+    
     harvest_batch = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
     storage_batches = models.ForeignKey(TT_Storage_Batch, on_delete=models.CASCADE)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
@@ -551,14 +586,26 @@ class TT_Product_Batch(models.Model):
     to_row = models.IntegerField(null=True, blank=True)
     # uom (Unit of Measurement) & total_quantity & total_weight will help link important info to model that can (1) inform inventory of the total_quantity & total_weight of incoming product units; (2) Lab_sample weights can subtract from this when created to keep amounts current.
     uom = models.CharField(max_length=250, null=True, blank=True)
-    total_quantity = models.IntegerField(null=True, blank=True)
+    total_quantity = models.IntegerField(null=True, blank=False)
     # Add weights of selected storage_batches to get this
-    total_weight = models.FloatField(null=True, blank=True)
+    total_weight = models.FloatField(null=True, blank=False)
     remaining_quantity = models.IntegerField(null=True, blank=True)
     remaining_weight = models.FloatField(null=True, blank=True)
     available = models.BooleanField(default=False)
+    
     # Select if product uses WET (fresh frozen) or DRY (flower) cannabis
-    wet_dry = models.CharField(max_length=3, null=True, blank=True)
+    WETDRY = (
+        ('wet', 'wet'),
+        ('dry', 'dry'),
+    )
+
+    wet_dry = models.CharField(
+        max_length=3,
+        choices=WETDRY,
+        blank=False,
+        default='wet',
+    )
+    
     packaging = models.CharField(max_length=250, null=True, blank=True)
     wholesale_price = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     msrp = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
@@ -575,7 +622,7 @@ class TT_Product_Batch(models.Model):
     sku = models.CharField(max_length=250, null=True, blank=True)
     coa = models.URLField(null=True, blank=True)
     tested = models.BooleanField(default=False)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
            
 
@@ -591,7 +638,7 @@ class TT_Inventory(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    inventory_name = models.CharField(max_length=250, null=True, blank=True)
+    inventory_name = models.CharField(max_length=250, null=True, blank=False)
     inventory_type = models.CharField(max_length=250, null=True, blank=True)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     sublot = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
@@ -601,7 +648,7 @@ class TT_Inventory(models.Model):
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #BiotrackAPI key = 'id'
     id_serial = models.IntegerField(null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -618,9 +665,9 @@ class TT_Inventory_Product(models.Model):
     inventory = models.ForeignKey(TT_Inventory, on_delete=models.CASCADE)
     product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
     qa_status = models.CharField(max_length=250, null=True, blank=True)
-    total_quantity = models.IntegerField(null=True, blank=True)
+    total_quantity = models.IntegerField(null=True, blank=False)
     remaining_quantity = models.IntegerField(null=True, blank=True)
-    total_amount = models.FloatField(null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=False)
     remaining_amount = models.FloatField(null=True, blank=True)
     unit_based = models.BooleanField(default=False)
     usable_weight = models.FloatField(null=True, blank=True)
@@ -631,7 +678,7 @@ class TT_Inventory_Product(models.Model):
     session_time = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -649,7 +696,7 @@ class Invoice_Model(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    invoice_name = models.CharField(max_length=250, null=True, blank=True)
+    invoice_name = models.CharField(max_length=250, null=True, blank=False)
     inventory = models.ForeignKey(TT_Inventory, on_delete=models.CASCADE)
     accepted = models.BooleanField(default=False)
     buyer_location_license = models.CharField(max_length=250, null=True, blank=True)
@@ -657,7 +704,7 @@ class Invoice_Model(models.Model):
     location_license = models.CharField(max_length=250, null=True, blank=True)
     refund_invoice_id = models.CharField(max_length=250, null=True, blank=True)
     refunded = models.BooleanField(default=False)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True) 
 
@@ -677,14 +724,14 @@ class Invoice_Inventory(models.Model):
     invoice_model = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
     inventory_product = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=250, null=True, blank=True)
-    amount = models.FloatField(null=True, blank=True) # Quantity
-    price = models.FloatField(null=True, blank=True)
+    amount = models.FloatField(null=True, blank=False) # Quantity
+    price = models.FloatField(null=True, blank=False)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     invoice_id = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True) 
     uom = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -699,7 +746,7 @@ class TT_Lab_Sample(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    sample_name = models.CharField(max_length=250, null=True, blank=True)
+    sample_name = models.CharField(max_length=250, null=True, blank=False)
     product_batch = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
     location = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
@@ -722,7 +769,7 @@ class TT_Lab_Sample(models.Model):
     results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
     rn_d = models.BooleanField(default=False)
     sample_use = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     test_results = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
@@ -739,10 +786,10 @@ class Manifest_Driver(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    dateof_birth = models.CharField(max_length=250, null=True, blank=True)
+    dateof_birth = models.DateField(null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
-    name = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=250, null=True, blank=False)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -763,12 +810,12 @@ class Stop_Item(models.Model):
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
     manifest_id = models.CharField(max_length=250, null=True, blank=True)
     quantity = models.FloatField(null=True, blank=True)
-    quantity_received = models.FloatField(null=True, blank=True)
-    stop_number = models.IntegerField(null=True, blank=True)
+    quantity_received = models.FloatField(null=True, blank=False)
+    stop_number = models.IntegerField(null=True, blank=False)
     transaction_id = models.IntegerField(null=True, blank=True)
     # TT_Product_Batch.total_weight = TT_Product_Batch.total_weight - Stop_Item.weight
-    weight = models.FloatField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    weight = models.FloatField(null=True, blank=False)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -776,28 +823,28 @@ class Stop_Item(models.Model):
         return reverse('stop_item_detail', args=[str(self.uid)])
     
     def __str__(self):
-        return f'{self.inventory_product.product_batch.product_name}'
+        return f'Stop {self.stop_number}: {self.inventory_product.product_batch.product_name} item'
 
 
 class Manifest_Stop(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    stop_name = models.CharField(max_length=250, null=True, blank=True)
-    approximate_arrival = models.DateTimeField(null=True, blank=True)
-    approximate_departure = models.DateTimeField(null=True, blank=True)
+    stop_name = models.CharField(max_length=250, null=True, blank=False)
+    approximate_arrival = models.DateField(null=True, blank=True)
+    approximate_departure = models.DateField(null=True, blank=True)
     approximate_route = models.CharField(max_length=250, null=True, blank=True)
     driver_arrived = models.BooleanField(default=False)
-    driver_arrived_time = models.CharField(max_length=250, null=True, blank=True)
+    driver_arrived_time = models.TimeField(null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
-    invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE, blank=True, null=True)
     biotrack_invoice_id = models.CharField(max_length=250, null=True, blank=True) #Original BiotrackAPI key = 'invoice_id'
     items = models.ForeignKey(Stop_Item, on_delete=models.CASCADE)
     items_count = models.IntegerField(null=True, blank=True)
     location_license = models.CharField(max_length=250, null=True, blank=True)
     manifest_id = models.CharField(max_length=250, null=True, blank=True)
     stop_number = models.IntegerField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -814,8 +861,8 @@ class Manifest_Vehicle(models.Model):
     deleted = models.BooleanField(default=False)
     description = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.CharField(max_length=250, null=True, blank=True) #Original BiotrackAPI key = 'id'
-    vehicle_name = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    vehicle_name = models.CharField(max_length=250, null=True, blank=False)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -831,8 +878,8 @@ class Manifest_ThirdPartyTransporter(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
     license_number = models.CharField(max_length=250, null=True, blank=True)
-    name = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=250, null=True, blank=False)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -847,7 +894,25 @@ class Manifest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    manifest_name = models.CharField(max_length=250, null=True, blank=True)
+    manifest_name = models.CharField(max_length=250, null=True, blank=False)
+    
+
+    DESTINATIONCAT = (
+        ('cultivator','cultivator'),
+        ('processor','processor'),
+        ('lab','lab'),
+        ('dispensary','dispensary'),
+        ('other','other'),
+    )
+
+    destination_category = models.CharField(
+        max_length=25,
+        choices=DESTINATIONCAT,
+        blank=True,
+        default='dispensary',
+    )
+
+    stops = models.ForeignKey(Manifest_Stop, on_delete=models.CASCADE)
     city = models.CharField(max_length=250, null=True, blank=True)
     completed = models.BooleanField(default=False)
     completion_date = models.DateField(null=True, blank=True)
@@ -860,11 +925,10 @@ class Manifest(models.Model):
     license_number = models.CharField(max_length=250, null=True, blank=True)
     manifest_id = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250, null=True, blank=True)
-    phone = models.CharField(max_length=250, null=True, blank=True)
+    phone = models.CharField(max_length=25, null=True, blank=True)
     received = models.BooleanField(default=False)
     state = models.CharField(max_length=250, null=True, blank=True)
     stop_count = models.IntegerField(null=True, blank=True)
-    stops = models.ManyToManyField(Manifest_Stop)
     street = models.CharField(max_length=250, null=True, blank=True)
     third_party_transporter = models.ForeignKey(Manifest_ThirdPartyTransporter, on_delete=models.CASCADE)
     total_item_count = models.IntegerField(null=True, blank=True)
@@ -873,7 +937,7 @@ class Manifest(models.Model):
     updated_on = models.CharField(max_length=250, null=True, blank=True)
     vehicle = models.ForeignKey(Manifest_Vehicle, on_delete=models.CASCADE)
     zip = models.CharField(max_length=250, null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
     notes = models.TextField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -890,7 +954,7 @@ class Manifest(models.Model):
 class TT_Location_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Location, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -905,7 +969,7 @@ class TT_Location_Delete(models.Model):
 class TT_Sublot_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Sublot, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -920,7 +984,7 @@ class TT_Sublot_Delete(models.Model):
 class Strain_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(Strain, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -935,7 +999,7 @@ class Strain_Delete(models.Model):
 class TT_Plant_Batch_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Plant_Batch, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -950,7 +1014,7 @@ class TT_Plant_Batch_Delete(models.Model):
 class TT_Plant_Batch_Harvest_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Plant_Batch_Harvest, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -965,7 +1029,7 @@ class TT_Plant_Batch_Harvest_Delete(models.Model):
 class TT_Storage_Batch_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Storage_Batch, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -980,7 +1044,7 @@ class TT_Storage_Batch_Delete(models.Model):
 class TT_Product_Batch_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Product_Batch, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -995,7 +1059,7 @@ class TT_Product_Batch_Delete(models.Model):
 class Lab_Result_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1010,10 +1074,10 @@ class Lab_Result_Delete(models.Model):
 class Lab_Sample_Result_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
-    session_time = models.DateTimeField(auto_now_add=True)
+    session_time = models.DateField(auto_now_add=True)
 
     def get_absolute_url(self):
         """Returns the url to access a particular instance."""
@@ -1026,7 +1090,7 @@ class Lab_Sample_Result_Delete(models.Model):
 class TT_Lab_Sample_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Lab_Sample, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1041,7 +1105,7 @@ class TT_Lab_Sample_Delete(models.Model):
 class TT_Inventory_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Inventory, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1056,7 +1120,7 @@ class TT_Inventory_Delete(models.Model):
 class TT_Inventory_Product_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1071,7 +1135,7 @@ class TT_Inventory_Product_Delete(models.Model):
 class Invoice_Model_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1086,7 +1150,7 @@ class Invoice_Model_Delete(models.Model):
 class Invoice_Inventory_Delete(models.Model):
     uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    delete_time = models.DateTimeField(auto_now_add=True)
+    delete_time = models.DateField(auto_now_add=True)
     deleted_item = models.ForeignKey(Invoice_Inventory, on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
 
@@ -1096,3 +1160,94 @@ class Invoice_Inventory_Delete(models.Model):
 
     def __str__(self):
         return f'Delete Record - {self.deleted_item} {self.uid}'
+    
+
+class Manifest_Driver_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Manifest_Driver, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_driver_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Stop_Item_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Stop_Item, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('stop_item_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Manifest_Stop_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Manifest_Stop, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_stop_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Manifest_Vehicle_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Manifest_Vehicle, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_vehicle_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Manifest_ThirdPartyTransporter_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Manifest_ThirdPartyTransporter, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_thirdpartytransporter_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+
+
+class Manifest_Delete(models.Model):
+    uid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    delete_time = models.DateField(auto_now_add=True)
+    deleted_item = models.ForeignKey(Manifest, on_delete=models.CASCADE)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_delete_detail', args=[str(self.uid)])
+
+    def __str__(self):
+        return f'Delete Record - {self.deleted_item} {self.uid}'
+

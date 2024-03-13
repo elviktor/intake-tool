@@ -6,14 +6,202 @@ from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from . import forms
-from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info
+from django.forms import ValidationError
+from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info,Manifest_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete
 
 # Contents
 # ========
+# > Data Display Views
+# > Filter & Search Views
 # > TT Object Conversion Form Views
 # > Create Update Delete Template Views
 # > Detail Template Views
 # > List Template Views
+
+
+# Data Display Views
+# ===============================
+@login_required
+def ocm_bimonthly_inventory_report(request):
+    """
+    This view displays data requested by the current
+    OCM Bimonthly Inventory report.
+
+    The user selects a date range and then the data 
+    is output as answers to the report's numbered questions.
+    """
+
+    if request.method == 'POST':
+
+        # User inputs date range
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+
+        # Queries  (suffix = q01   ex. batches_q01)
+        # =======
+
+        # Query 01
+        # --------
+        # Description: What inventory tracking system are you currently using? 
+        # Query: Trichomes Consulting
+
+        # Query 02
+        # --------
+        # Description: Did you distribute finished flower products to Dispensaries that were processed by a licensed Processor during this inventory period?
+        # Query:
+        
+        flower_batches_q02 = TT_Product_Batch.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(product_category='flower')
+
+        pre_roll_batches_q02 = TT_Product_Batch.objects.filter(user=request.user).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(product_category='pre roll')
+
+        total_quantity_q02 = 0
+        message_q02 = "No"
+
+        for batch in flower_batches_q02:
+            total_quantity_q02 += batch.remaining_quantity
+            
+        for batch in pre_roll_batches_q02:
+            total_quantity_q02 += batch.remaining_quantity
+            
+        if total_quantity_q02 > 0:
+            message_q02 = "Yes"
+
+
+        # Query 03
+        # --------
+        # Description: Did you distribute finished flower products to Dispensaries that were processed by a licensed Processor during this inventory period?
+        # Query:
+        batches_q03 = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='dispensary').filter(stops__items__inventory_product__product_batch__product_category='processed')
+        
+        total_quantity = 0
+        message_q03 = "No"
+
+        for batch in batches_q03:
+            batch.stops.items.quantity += total_quantity
+            
+        if total_quantity > 0:
+            message_q03 = "Yes"
+
+
+        # Query 04
+        # --------
+        # Description: Do you have packaging onsite for flower that can be used for retail sale?
+        # Query: [User can review their site map]
+
+
+        # Query 05
+        # --------
+        # Description: Products distributed to Dispensaries this inventory period
+        # Query:
+        batches_q05 = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='dispensary')
+        
+        total_quantity_q05 = 0
+
+        for batch in batches_q05:
+            total_quantity_q05 += batch.stops.items.quantity
+
+
+        # Query 06
+        # --------
+        # Description: Dry weight in pounds (lbs) *
+        # a: Bulk flower transferred to Cultivators __0___
+        # b: Bulk flower transferred to Processors __0___
+        # Query a - To Cultivator:
+        batches_q06a = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='cultivator').filter(stops__items__inventory_product__product_batch__storage_batches__wet_dry='dry')
+        
+        total_weight_q06a = 0.0
+
+        for batch in batches_q06a:
+            total_weight_q06a += batch.stops.items.weight
+        
+        # Query b - To Processor:
+        batches_q06b = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='processor').filter(stops__items__inventory_product__product_batch__storage_batches__wet_dry='dry')
+        
+        total_weight_q06b = 0.0
+
+        for batch in batches_q06b:
+            total_weight_q06b += batch.stops.items.weight
+
+
+
+        # Query 07
+        # --------
+        # Description: WET weight in pounds (lbs) *
+        # a: Fresh or frozen flower transferred to Cultivators __0___
+        # b: Fresh or frozen flower transferred to Processors __0___
+        # Query a - To Cultivator:
+        batches_q07a = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='cultivator').filter(stops__items__inventory_product__product_batch__storage_batches__wet_dry='wet')
+        
+        total_weight_q07a = 0.0
+
+        for batch in batches_q07a:
+            total_weight_q07a += batch.stops.items.weight
+        
+        # Query b - To Processor:
+        batches_q07b = Manifest.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(destination_category='processor').filter(stops__items__inventory_product__product_batch__storage_batches__wet_dry='wet')
+        
+        total_weight_q07b = 0.0
+
+        for batch in batches_q07b:
+            total_weight_q07b += batch.stops.items.weight
+
+        # Query 08
+        # --------
+        # Description: Biomass Cannabis (dry) on hand close of inventory period
+        # Query:
+        batches_q08 = TT_Storage_Batch.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(produce_category='biomass')
+        
+        total_weight_q08 = 0.0
+
+        for batch in batches_q08:
+            total_weight_q08 += batch.weight
+
+
+        # Query 09
+        # --------
+        # Description: Frozen Cannabis (wet) on hand close of inventory period
+        # Query:
+        batches_q09 = TT_Storage_Batch.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(produce_category='flower')
+        
+        total_weight_q09 = 0.0
+
+        for batch in batches_q09:
+            total_weight_q09 += batch.weight
+
+
+        # Query 10
+        # --------
+        # Description: Frozen Cannabis (wet) on hand close of inventory period
+        # Query:
+        batches_q10 = TT_Storage_Batch.objects.filter(user=request.user).filter(deleted=False).filter(session_time__gt=start_date).filter(session_time__lt=end_date).filter(produce_category='frozen')
+        
+        total_weight_q10 = 0.0
+
+        for batch in batches_q10:
+            total_weight_q10 += batch.weight
+
+
+        # POST Return statement    
+        return render(request, 'tracker/ocm_bimonthly_inventory_report.html', {'start_date':start_date, 'end_date':end_date, 'total_quantity_q02':total_quantity_q02, 
+        'flower_batches_q02':flower_batches_q02,'pre_roll_batches_q02':pre_roll_batches_q02,'message_q02':message_q02,'batches_q03':batches_q03,'message_q03':message_q03,'batches_q05':batches_q05,'total_quantity_q05':total_quantity_q05,'batches_q06a':batches_q06a,'total_weight_q06a':total_weight_q06a, 'batches_q06b':batches_q06b,'total_weight_q06b':total_weight_q06b,'batches_q07a':batches_q07a,'total_weight_q07a':total_weight_q07a, 'batches_q07b':batches_q07b,'total_weight_q07b':total_weight_q07b,'batches_q08':batches_q08,'total_weight_q08':total_weight_q08, 'batches_q09':batches_q09,'total_weight_q09':total_weight_q09, 'batches_q10':batches_q10,'total_weight_q10':total_weight_q10})
+    
+    else:
+        return render(request, 'tracker/ocm_bimonthly_inventory_report.html', {})
+
+
+
+
+# Filter & Search Views
+# =====================
+@login_required
+def tt_plant_batch_harvest_search(request):
+    if request.method == 'POST':
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+        results = TT_Plant_Batch_Harvest.objects.filter(user=request.user).filter(deleted=False).filter(harvest_start_date__gte=start_date).filter(harvest_start_date__lte=end_date)
+        return render(request, 'tracker/tt_plant_batch_harvest_search.html', {'start_date':start_date, 'end_date':end_date, 'results':results})
+    else:
+        return render(request, 'tracker/tt_plant_batch_harvest_search.html', {})
 
 
 # TT Object Conversion Form Views
@@ -41,9 +229,11 @@ def harvest_to_storage(request):
             weight = form.cleaned_data['weight'] 
             wet_dry = form.cleaned_data['wet_dry']
             package_number = form.cleaned_data['package_number']
+            produce_category = form.cleaned_data['produce_category']
             harvest_batch = form.cleaned_data['harvest_batch']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot'] 
+            location_date = form.cleaned_data['location_date']
 
             form = forms.TTHarvestToStorageForm(request.POST, instance=harvest_batch, user=user)
             formset_a = forms.TTHarvestToStorageFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
@@ -51,19 +241,25 @@ def harvest_to_storage(request):
             formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location=location, sublot=sublot, weight=weight, package_number=package_number, wet_dry=wet_dry)
+            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location_date=location_date,location=location, sublot=sublot, weight=weight, package_number=package_number, produce_category=produce_category, wet_dry=wet_dry)
 
             if wet_dry == "wet":
                 # Update the harvest batch weight
-                harvest_batch.remaining_wet_weight -= weight
-                harvest_batch.save()
-                form.save()
+                if harvest_batch.remaining_wet_weight != None:
+                    harvest_batch.remaining_wet_weight -= weight
+                    harvest_batch.save()
+                    form.save()
+                else:
+                    raise ValidationError("Check harvest batch quantity")
             
             if wet_dry == "dry":
                 # Update the harvest batch weight
-                harvest_batch.remaining_dry_weight -= weight
-                harvest_batch.save()
-                form.save()
+                if harvest_batch.remaining_dry_weight  != None:
+                    harvest_batch.remaining_dry_weight -= weight
+                    harvest_batch.save()
+                    form.save()
+                else:
+                    raise ValidationError("Check harvest batch quantity")
             
             return redirect('home')
     else:
@@ -177,11 +373,14 @@ def product_to_lab_sample(request):
             lab_sample_batch = TT_Lab_Sample.objects.create(user=request.user,sample_name=sample_name, product_batch=product_batch, location=location, sublot=sublot, amount=amount, quantity=quantity, results=results, test_results=test_results)
 
             # Update the product batch amount (weight) and quantity
-            product_batch.remaining_weight -= amount
-            product_batch.remaining_quantity -= quantity
-            product_batch.save()
-            form.save()
-            
+            if product_batch.remaining_weight != None:
+                product_batch.remaining_weight -= amount
+                product_batch.remaining_quantity -= quantity
+                product_batch.save()
+                form.save()
+            else:
+                raise ValidationError("Check product batch quantity")
+
             return redirect('home')
     
     else:
@@ -228,10 +427,13 @@ def product_to_inventory(request):
             inventory_batch = TT_Inventory_Product.objects.create(user=request.user,inventory=inventory, product_batch=product_batch, total_amount=total_amount, remaining_amount=total_amount, total_quantity=total_quantity, remaining_quantity=total_quantity)
 
             # Update the product batch amount (weight) and quantity
-            product_batch.remaining_weight -= total_amount
-            product_batch.remaining_quantity -= total_quantity
-            product_batch.save()
-            form.save()
+            if product_batch.remaining_weight != None:
+                product_batch.remaining_weight -= total_amount
+                product_batch.remaining_quantity -= total_quantity
+                product_batch.save()
+                form.save()
+            else:
+                raise ValidationError("Check product batch quantity")
             
             return redirect('home')
     
@@ -248,32 +450,37 @@ def product_to_inventory(request):
 
 @login_required
 def inventory_to_stop_item(request):
+# This can be used as stop_item_create_form
     
     if request.method == 'POST':
 
         inventory_product = None
         user = request.user
 
-        form = forms.TTInventoryToStopItemForm(request.POST)
+        form = forms.TTInventoryToStopItemForm(request.POST,user=user)
         formset_a = forms.TTInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
 
         if form.is_valid():
             weight = form.cleaned_data['weight'] 
-            quantity = form.cleaned_data['quantity']
+            quantity_received = form.cleaned_data['quantity_received']
             inventory_product = form.cleaned_data['inventory_product']
+            stop_number = form.cleaned_data['stop_number']
             
             form = forms.TTInventoryToStopItemForm(request.POST, instance=user, user=user)
-            formset_a = forms.TInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
+            formset_a = forms.TTInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
 
 
             # Create a new Stop Item instance and associate it with the inventory
-            stop_item = Stop_Item.objects.create(user=request.user,inventory_product=inventory_product, weight=weight, quantity=quantity, quantity_received=quantity)
+            stop_item = Stop_Item.objects.create(user=request.user,inventory_product=inventory_product, weight=weight, quantity=quantity_received, quantity_received=quantity_received, stop_number=stop_number)
 
             # Update the product batch amount (weight) and quantity
-            inventory_product.remaining_weight -= weight
-            inventory_product.remaining_quantity -= quantity
-            inventory_product.save()
-            form.save()
+            if inventory_product.remaining_amount != None:
+                inventory_product.remaining_amount -= weight
+                inventory_product.remaining_quantity -= quantity_received
+                inventory_product.save()
+                form.save()
+            else:
+                raise ValidationError("Check product batch quantity")
             
             return redirect('home')
     
@@ -301,7 +508,7 @@ def inventory_to_invoice_item(request):
         
         if form.is_valid():
             quantity = form.cleaned_data['amount']
-            invoice_model = form.cleaned_date['invoice_model']
+            invoice_model = form.cleaned_data['invoice_model']
             inventory_product = form.cleaned_data['inventory_product']
             
             
@@ -313,9 +520,12 @@ def inventory_to_invoice_item(request):
             invoice_item = Invoice_Inventory.objects.create(user=request.user,inventory_product=inventory_product,invoice_model=invoice_model, amount=quantity)
 
             # Update the product batch amount (weight) and quantity
-            inventory_product.remaining_quantity -= quantity
-            inventory_product.save()
-            form.save()
+            if inventory_product.remaining_quantity:
+                inventory_product.remaining_quantity -= quantity
+                inventory_product.save()
+                form.save()
+            else:
+                raise ValidationError("Check product batch quantity")
             
             return redirect('home')
     
@@ -328,7 +538,7 @@ def inventory_to_invoice_item(request):
         formset_a = forms.TTInventoryToInvoiceItemFormsetA(instance=invoice_model, form_kwargs={'user': request.user})
         formset_b = forms.TTInventoryToInvoiceItemFormsetB(instance=inventory_product, form_kwargs={'user': request.user})
 
-    return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
+    return render(request, 'tracker/tt_inventory_to_invoice_item_form.html', {'form': form})
 
 
 # Custom User-Only Model Create Views
@@ -524,12 +734,13 @@ def tt_sublot_create_form(request):
             # Example: quantity = form.cleaned_data['amount']
             location = form.cleaned_data['location']
             sublot_name = form.cleaned_data['sublot_name']
+            rows = form.cleaned_data['rows']
 
             form = forms.TTSublotCreateForm(request.POST, instance=location, user=user)
             formset = forms.TTSublotCreateFormset(request.POST, instance=location, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
-            sublot = TT_Sublot.objects.create(user=request.user, location=location, sublot_name=sublot_name)
+            sublot = TT_Sublot.objects.create(user=request.user, location=location, sublot_name=sublot_name, rows=rows)
 
             # Make additional manipulations
             # Example: inventory_product.remaining_quantity -= quantity
@@ -574,6 +785,20 @@ def tt_plant_batch_create_form(request):
             strain = form.cleaned_data['strain']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot']
+            birth_date = form.cleaned_data['birth_date']
+            quantity = form.cleaned_data['quantity']
+            from_row = form.cleaned_data['from_row']
+            to_row = form.cleaned_data['to_row']
+            mother = form.cleaned_data['mother']
+            org_id = form.cleaned_data['org_id']
+            parent_id = form.cleaned_data['parent_id']
+            destroy_reason = form.cleaned_data['destroy_reason']
+            destroy_scheduled = form.cleaned_data['destroy_scheduled']
+            destroy_scheduled_time = form.cleaned_data['destroy_scheduled_time']
+            harvest_scheduled = form.cleaned_data['harvest_scheduled']
+            notes = form.cleaned_data['notes']
+
+
             
             form = forms.TTPlantBatchCreateForm(request.POST, instance=location, user=user)
             formset_a = forms.TTPlantBatchCreateFormsetA(instance=strain, form_kwargs={'user': request.user})
@@ -581,7 +806,7 @@ def tt_plant_batch_create_form(request):
             formset_c = forms.TTPlantBatchCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
-            plant_batch = TT_Plant_Batch.objects.create(user=request.user, strain=strain, location=location, sublot=sublot)
+            plant_batch = TT_Plant_Batch.objects.create(user=request.user, strain=strain,location=location, sublot=sublot,birth_date=birth_date,quantity=quantity,from_row=from_row,to_row=to_row,mother=mother,org_id=org_id,parent_id=parent_id,destroy_reason=destroy_reason,destroy_scheduled=destroy_scheduled,destroy_scheduled_time=destroy_scheduled_time,harvest_scheduled=harvest_scheduled,            notes=notes)
 
             # Make additional manipulations
             # Example: inventory_product.remaining_quantity -= quantity
@@ -630,6 +855,8 @@ def tt_plant_batch_harvest_create_form(request):
             plant_batch = form.cleaned_data['plant_batch']
             location = form.cleaned_data['location']
             sublot = form.cleaned_data['sublot']
+            harvest_start_date = form.cleaned_data['harvest_start_date']
+            harvest_finish_date = form.cleaned_data['harvest_finish_date']
             total_dry_weight = form.cleaned_data['total_dry_weight']
             total_wet_weight = form.cleaned_data['total_wet_weight']
 
@@ -639,7 +866,7 @@ def tt_plant_batch_harvest_create_form(request):
             formset_c = forms.TTPlantBatchHarvestCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
             
             # Create a new Model instance and associate it with the batch
-            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, plant_batch=plant_batch, location=location, sublot=sublot, total_wet_weight=total_wet_weight,total_dry_weight=total_dry_weight,remaining_wet_weight=total_wet_weight, remaining_dry_weight=total_dry_weight)
+            harvest_batch = TT_Plant_Batch_Harvest.objects.create(user=request.user, plant_batch=plant_batch, location=location, sublot=sublot,harvest_finish_date=harvest_finish_date, harvest_start_date=harvest_start_date,  total_wet_weight=total_wet_weight,total_dry_weight=total_dry_weight,remaining_wet_weight=total_wet_weight, remaining_dry_weight=total_dry_weight)
 
             # Make additional manipulations
             # Example: inventory_product.remaining_quantity -= quantity
@@ -664,6 +891,8 @@ def tt_plant_batch_harvest_create_form(request):
         formset_c = forms.TTPlantBatchHarvestCreateFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_plant_batch_harvest_create_form.html', {'form': form})
+
+
 
 @login_required
 def tt_inventory_create_form(request):
@@ -756,6 +985,251 @@ def invoice_model_create_form(request):
     return render(request, 'tracker/invoice_model_create_form.html', {'form': form})
 
 
+@login_required
+def manifest_driver_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.ManifestDriverCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            name = form.cleaned_data['name']
+            dateof_birth = form.cleaned_data['dateof_birth']
+
+            form = forms.ManifestDriverCreateForm(request.POST, instance=user, user=user)
+        
+            
+            # Create a new Model instance and associate it with the batch
+            manifest_driver = Manifest_Driver.objects.create(user=request.user, name=name, dateof_birth=dateof_birth)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.ManifestDriverCreateForm(user=user)
+
+    return render(request, 'tracker/manifest_driver_create_form.html', {'form': form})
+
+
+@login_required
+def manifest_stop_create_form(request):
+    
+    if request.method == 'POST':
+
+        items = None
+        invoice = None
+        user = request.user
+
+        form = forms.ManifestStopCreateForm(request.POST,user=user)
+        formset_a = forms.ManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+        formset_b = forms.ManifestStopCreateFormsetB(instance=items, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            stop_name = form.cleaned_data['stop_name']
+            stop_number = form.cleaned_data['stop_number']
+            approximate_arrival = form.cleaned_data['approximate_arrival']
+            approximate_departure = form.cleaned_data['approximate_departure']
+            approximate_route = form.cleaned_data['approximate_route']
+            driver_arrived = form.cleaned_data['driver_arrived']
+            driver_arrived_time = form.cleaned_data['driver_arrived_time']
+            invoice = form.cleaned_data['invoice']
+            items = form.cleaned_data['items']
+            #items_count = form.cleaned_data['items_count']
+            location_license = form.cleaned_data['location_license']
+            notes = form.cleaned_data['notes']
+            
+            form = forms.ManifestStopCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+            formset_b = forms.ManifestStopCreateFormsetB(instance=invoice, form_kwargs={'user': request.user})
+
+            # Create a new Model instance and associate it with the batch
+            manifest_stop = Manifest_Stop.objects.create(user=request.user,stop_name=stop_name, stop_number=stop_number, approximate_arrival=approximate_arrival,approximate_departure=approximate_departure,approximate_route=approximate_route, driver_arrived=driver_arrived,driver_arrived_time=driver_arrived_time,invoice=invoice,items=items,items_count=items.quantity,location_license=location_license,notes=notes)
+
+            # Manipulate model (optional)
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        items = None
+        invoice = None
+        user = request.user
+
+        form = forms.ManifestStopCreateForm(user=user)
+        formset_a = forms.ManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+        formset_b = forms.ManifestStopCreateFormsetB(instance=items, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_stop_create_form.html', {'form': form})
+
+
+@login_required
+def manifest_vehicle_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.ManifestVehicleCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            vehicle_name = form.cleaned_data['vehicle_name']
+            description = form.cleaned_data['description']
+            notes = form.cleaned_data['notes']
+
+            form = forms.ManifestVehicleCreateForm(request.POST, instance=user, user=user)
+        
+            
+            # Create a new Model instance and associate it with the batch
+            manifest_vehicle = Manifest_Vehicle.objects.create(user=request.user, description=description,vehicle_name=vehicle_name,notes=notes)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.ManifestVehicleCreateForm(user=user)
+
+    return render(request, 'tracker/manifest_vehicle_create_form.html', {'form': form})
+
+
+@login_required
+def manifest_thirdpartytransporter_create_form(request):
+    
+    if request.method == 'POST':
+
+        user = request.user
+
+        form = forms.ManifestThirdPartyTransporterCreateForm(request.POST,user=user)
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            name = form.cleaned_data['name']
+            license_number = form.cleaned_data['license_number']
+            notes = form.cleaned_data['notes']
+
+            form = forms.ManifestThirdPartyTransporterCreateForm(request.POST, instance=user, user=user)
+        
+            
+            # Create a new Model instance and associate it with the batch
+            manifest_thirdpartytransporter = Manifest_ThirdPartyTransporter.objects.create(user=request.user, name=name, license_number=license_number,notes=notes)
+
+            # Make additional manipulations
+            # Example: inventory_product.remaining_quantity -= quantity
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+        user = request.user
+        form = forms.ManifestThirdPartyTransporterCreateForm(user=user)
+
+    return render(request, 'tracker/manifest_thirdpartytransporter_create_form.html', {'form': form})
+
+
+@login_required
+def manifest_create_form(request):
+
+    if request.method == 'POST':
+
+        stops = None
+        drivers = None
+        third_party_transporter = None
+        vehicle = None
+        user = request.user
+
+        form = forms.ManifestCreateForm(request.POST,user=user)
+        formset_a = forms.ManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+        formset_b = forms.ManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+        formset_c = forms.ManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+        formset_d = forms.ManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+            manifest_name = form.cleaned_data['manifest_name']
+            # Destination info
+            destination_category = form.cleaned_data['destination_category']
+            name = form.cleaned_data['name']
+            phone = form.cleaned_data['phone']
+            street = form.cleaned_data['street']
+            city = form.cleaned_data['city']
+            state = form.cleaned_data['state']
+            zip = form.cleaned_data['zip']
+            # Stop and item info
+            stops = form.cleaned_data['stops']
+            stop_count = form.cleaned_data['stop_count']
+            total_item_count = form.cleaned_data['total_item_count']
+            # Driver info
+            drivers = form.cleaned_data['drivers']
+            vehicle = form.cleaned_data['vehicle']
+            third_party_transporter = form.cleaned_data['third_party_transporter']
+            # Status info
+            completed = form.cleaned_data['completed']
+            created_on = form.cleaned_data['created_on']
+            driver_arrived = form.cleaned_data['driver_arrived']
+            in_transit = form.cleaned_data['in_transit']
+            is_accepted = form.cleaned_data['is_accepted']
+            is_parked = form.cleaned_data['is_parked']
+            received = form.cleaned_data['received']
+            type = form.cleaned_data['type']
+            notes = form.cleaned_data['notes']
+
+
+            form = forms.ManifestCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+            formset_b = forms.ManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+            formset_c = forms.ManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+            formset_d = forms.ManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+
+            # Create a new instance
+            manifest = Manifest.objects.create( user=request.user, manifest_name=manifest_name,destination_category=destination_category,name=name,phone=phone,street=street,city=city,state=state,zip=zip,stops=stops,stop_count=stop_count,total_item_count=total_item_count,drivers=drivers,vehicle=vehicle,third_party_transporter=third_party_transporter,completed=completed,created_on=created_on,driver_arrived=driver_arrived,in_transit=in_transit,is_parked=is_parked, is_accepted=is_accepted,received=received,type=type,notes=notes)
+            
+            form.save()
+
+            return redirect('home')
+    else:
+        stops = None
+        drivers = None
+        third_party_transporter = None
+        vehicle = None
+        user = request.user
+
+        form = forms.ManifestCreateForm(user=user)
+        formset_a = forms.ManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+        formset_b = forms.ManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+        formset_c = forms.ManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+        formset_d = forms.ManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+        
+
+    return render(request, 'tracker/manifest_create_form.html', {'form': form})
 
 
 # Toggle Delete Views
@@ -1318,25 +1792,188 @@ def invoice_inventory_delete_form(request):
     return render(request, 'tracker/invoice_inventory_delete_form.html', {'form': form})
 
 
+@login_required
+def manifest_driver_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestDriverDeleteForm(request.POST,user=user)
+        formset_a = forms.ManifestDriverDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
 
 
-# Filter & Search Views
-# =====================
+        if form.is_valid():
 
-class TTPlantBatchHarvestSearch(LoginRequiredMixin, View):
-    template_name = 'tracker/tt_plant_batch_harvest_search.html'
+            deleted_item = form.cleaned_data['deleted_item'] 
 
-    def get(self, request, *args, **kwargs):
-        query = request.GET.get('q')
+            form = forms.ManifestDriverDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestDriverDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
 
-        if query:
-            results = TT_Plant_Batch_Harvest.objects.filter(plant_batch__strain__name__icontains=query)
-            # change the filter to a char field input
-        else:
-            results = TT_Plant_Batch_Harvest.objects.all()
 
-        context = {'results': results, 'query': query}
-        return render(request, self.template_name, context)
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Manifest_Driver_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestDriverDeleteForm(user=user)
+        formset_a = forms.ManifestDriverDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_driver_delete_form.html', {'form': form})
+
+
+@login_required
+def manifest_stop_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestStopDeleteForm(request.POST,user=user)
+        formset_a = forms.ManifestStopDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.ManifestStopDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestStopDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Manifest_Stop_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestStopDeleteForm(user=user)
+        formset_a = forms.ManifestStopDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_stop_delete_form.html', {'form': form})
+
+
+@login_required
+def manifest_vehicle_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestVehicleDeleteForm(request.POST,user=user)
+        formset_a = forms.ManifestVehicleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.ManifestVehicleDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestVehicleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Manifest_Vehicle_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestVehicleDeleteForm(user=user)
+        formset_a = forms.ManifestVehicleDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_vehicle_delete_form.html', {'form': form})
+
+
+@login_required
+def manifest_thirdpartytransporter_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestThirdPartyTransporterDeleteForm(request.POST,user=user)
+        formset_a = forms.ManifestThirdPartyTransporterDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.ManifestThirdPartyTransporterDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestThirdPartyTransporterDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Manifest_ThirdPartyTransporter_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestThirdPartyTransporterDeleteForm(user=user)
+        formset_a = forms.ManifestThirdPartyTransporterDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_thirdpartytransporter_delete_form.html', {'form': form})
+
+@login_required
+def manifest_delete_form(request):
+    
+    if request.method == 'POST':
+
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestDeleteForm(request.POST,user=user)
+        formset_a = forms.ManifestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+
+            deleted_item = form.cleaned_data['deleted_item'] 
+
+            form = forms.ManifestDeleteForm(request.POST, instance=user, user=user)
+            formset_a = forms.ManifestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+
+            # Create a new Product instance and associate it with the inventory
+            delete_batch = Manifest_Delete.objects.create(user=request.user,deleted_item=deleted_item)
+
+            form.save()
+            
+            return redirect('home')
+    else:
+        
+        deleted_item = None
+        user = request.user
+
+        form = forms.ManifestDeleteForm(user=user)
+        formset_a = forms.ManifestDeleteFormsetA(instance=deleted_item, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/manifest_delete_form.html', {'form': form})
 
 
 
