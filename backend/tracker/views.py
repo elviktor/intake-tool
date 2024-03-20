@@ -303,6 +303,22 @@ def storage_to_product(request):
             sublot = form.cleaned_data['sublot']
             total_weight = form.cleaned_data['total_weight']
             total_quantity = form.cleaned_data['total_quantity']
+            packaging = form.cleaned_data['packaging']
+            wholesale_price = form.cleaned_data['wholesale_price']
+            msrp = form.cleaned_data['msrp']
+            moq = form.cleaned_data['moq']
+            thc_percent = form.cleaned_data['thc_percent']
+            terp_percent = form.cleaned_data['terp_percent']
+            thc_mg = form.cleaned_data['thc_mg']
+            thc_mg_per_serving = form.cleaned_data['thc_mg_per_serving']
+            grow_type = form.cleaned_data['grow_type']
+            description = form.cleaned_data['description']
+            sell_points = form.cleaned_data['sell_points']
+            expiration_date = form.cleaned_data['expiration_date']
+            use_by_date = form.cleaned_data['use_by_date']
+            coa = form.cleaned_data['coa']
+            tested = form.cleaned_data['tested']
+            notes = form.cleaned_data['notes']
 
             form = forms.TTStorageToProductForm(request.POST, instance=user, user=user)
             formset_a = forms.TTStorageToProductFormsetA(instance=harvest_batch, form_kwargs={'user': request.user})
@@ -311,8 +327,19 @@ def storage_to_product(request):
             formset_d = forms.TTStorageToProductFormsetD(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new instance
-            product_batch = TT_Product_Batch.objects.create( user=request.user, product_name=product_name, harvest_batch=harvest_batch, storage_batches=storage_batches, location=location, sublot=sublot, total_weight=total_weight, remaining_weight=total_weight, total_quantity=total_quantity, remaining_quantity=total_quantity,  wet_dry=wet_dry)
+            product_batch = TT_Product_Batch.objects.create( user=request.user, product_name=product_name, harvest_batch=harvest_batch, storage_batches=storage_batches, location=location, sublot=sublot, total_weight=total_weight, remaining_weight=total_weight, total_quantity=total_quantity, remaining_quantity=total_quantity,  wet_dry=wet_dry,packaging=packaging,wholesale_price=wholesale_price,msrp=msrp,moq=moq,thc_percent=thc_percent,terp_percent=terp_percent,thc_mg=thc_mg,thc_mg_per_serving=thc_mg_per_serving,grow_type=grow_type,description=description,sell_points=sell_points,expiration_date=expiration_date,use_by_date=use_by_date,coa=coa,tested=tested,notes=notes)
             
+            # Subtract converted total product weight (g) from  storage batch weight 
+
+            total_pounds = total_weight * 0.00220462 # Convert g > lb
+
+            if storage_batches.weight != None:
+                storage_batches.weight -= total_pounds
+                storage_batches.save()
+                form.save()
+            else:
+                raise ValidationError("Check storage batch weight")
+
             form.save()
 
             return redirect('home')

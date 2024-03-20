@@ -551,7 +551,7 @@ class TT_Storage_Batch(models.Model):
         return reverse('tt_storage_batch_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.harvest_batch.plant_batch.strain} {self.wet_dry} Storage Batch {str(self.package_number)}'
+        return f'{self.harvest_batch.plant_batch.strain} - {self.wet_dry} {self.produce_category} - Storage Batch {str(self.package_number)}'
 
 
 class TT_Product_Batch(models.Model):
@@ -587,7 +587,7 @@ class TT_Product_Batch(models.Model):
     # uom (Unit of Measurement) & total_quantity & total_weight will help link important info to model that can (1) inform inventory of the total_quantity & total_weight of incoming product units; (2) Lab_sample weights can subtract from this when created to keep amounts current.
     uom = models.CharField(max_length=250, null=True, blank=True)
     total_quantity = models.IntegerField(null=True, blank=False)
-    # Add weights of selected storage_batches to get this
+    # Total amount of cannabis used from storage_batch
     total_weight = models.FloatField(null=True, blank=False)
     remaining_quantity = models.IntegerField(null=True, blank=True)
     remaining_weight = models.FloatField(null=True, blank=True)

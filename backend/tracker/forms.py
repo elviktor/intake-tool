@@ -13,6 +13,7 @@ class DateTimeInput(forms.DateTimeInput):
 class TimeInput(forms.TimeInput):
    input_type = 'time'
 
+# TODO: I need to add filtering by 'deleted == False' to ALL forms 
 
 class TTHarvestToStorageForm(ModelForm):
    class Meta:
