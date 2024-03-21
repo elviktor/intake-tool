@@ -42,6 +42,8 @@ urlpatterns = [
 
      path('forms/inventory_to_stop_item/', views.inventory_to_stop_item, name='tt_inventory_to_stop_item_form'),
 
+     path('forms/lab_sample_to_ls_stop_item/', views.lab_sample_to_ls_stop_item, name='tt_lab_sample_to_ls_stop_item_form'),
+
      path('forms/inventory_to_invoice_item/', views.inventory_to_invoice_item, name='tt_inventory_to_invoice_item_form'),
 
      path('forms/strain_create_form/', views.strain_create_form, name='strain_create_form'),
@@ -68,13 +70,18 @@ urlpatterns = [
 
      path('forms/manifest_stop_create_form/', views.manifest_stop_create_form, name='manifest_stop_create_form'),
 
+     path('forms/ls_manifest_stop_create_form/', views.ls_manifest_stop_create_form, name='ls_manifest_stop_create_form'),
+
      path('forms/manifest_vehicle_create_form/', views.manifest_vehicle_create_form, name='manifest_vehicle_create_form'),
 
      path('forms/manifest_thirdpartytransporter_create_form/', views.manifest_thirdpartytransporter_create_form, name='manifest_thirdpartytransporter_create_form'),
 
      path('forms/manifest_create_form/', views.manifest_create_form, name='manifest_create_form'),
 
+     path('forms/ls_manifest_create_form/', views.ls_manifest_create_form, name='ls_manifest_create_form'),
 
+
+# TODO: Add LS_Manifest, LS_Stop_Item, etc delete forms
 
 # Toggle Delete Form URLs
 # ==================================

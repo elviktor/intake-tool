@@ -93,6 +93,18 @@
                     <!-- Left Menu Start ('metismenu' in ul)-->
                     <ul class="list-unstyled" id="side-menu">
                         
+                        <li class="menu-title">Reporting</li>
+
+                        <li>
+                            <a href="{% url 'ocm_bimonthly_inventory_report' %}" class="">
+                                <i class="bi bi-file-bar-graph"></i>
+
+                                <span>OCM Bi-Monthly Inventory Report</span>
+                            </a>
+                        </li>
+
+
+
                         <li class="menu-title">System Setup</li>
                         
                         <li>
@@ -194,20 +206,7 @@
                             </ul>
                         </li>
 
-                        <li>
-                            <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="bi bi-file-earmark-medical"></i>
-
-                                <span>Lab Samples</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a target="_self" href="{% url 'lab_result_create_form' %}">Store Lab Result</a></li>
-                                <li><a target="_self" href="{% url 'lab_sample_result_create_form' %}">Store Lab Sample Result</a></li>
-                                <li><a target="_self" href="{% url 'tt_product_to_lab_sample_form' %}">Store Lab Sample Set</a></li>
-                                <li><a href="{% url 'tt_lab_sample_delete_form' %}">Delete</a></li>
-                            </ul>
-                        </li>
-
+                        
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="bi bi-shop-window"></i>
@@ -241,7 +240,7 @@
                                 <span>Transport Manifests</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{% url 'tt_inventory_to_stop_item_form' %}">Create Stop Item</a></li>
+                                <li><a href="{% url 'tt_inventory_to_stop_item_form' %}">Add Inventory Stop Item</a></li>
                                 <li><a href="{% url 'manifest_stop_create_form' %}">Add Manifest Stop</a></li>
                                 <li><a href="{% url 'manifest_driver_create_form' %}">Add Driver</a></li>
                                 <li><a href="{% url 'manifest_vehicle_create_form' %}">Add Vehicle</a></li>
@@ -251,17 +250,22 @@
                             </ul>
                         </li>   
 
-                        <li class="menu-title">Reporting</li>
-
                         <li>
-                            <a href="{% url 'ocm_bimonthly_inventory_report' %}" class="">
-                                <i class="bi bi-file-bar-graph"></i>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="bi bi-file-earmark-medical"></i>
 
-                                <span>OCM Bi-Monthly Inventory Report</span>
+                                <span>Lab Samples</span>
                             </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a target="_self" href="{% url 'lab_result_create_form' %}">Store Lab Result</a></li>
+                                <li><a target="_self" href="{% url 'lab_sample_result_create_form' %}">Store Lab Sample Result</a></li>
+                                <li><a target="_self" href="{% url 'tt_product_to_lab_sample_form' %}">Store Lab Sample Set</a></li>
+                                <li><a href="{% url 'tt_lab_sample_delete_form' %}">Delete Sample Set</a></li>
+                                <li><a href="{% url 'tt_lab_sample_to_ls_stop_item_form' %}">Add Lab Sample Manifest Item</a></li>
+                                <li><a href="{% url 'ls_manifest_stop_create_form' %}">Add Lab Sample Manifest Stop</a></li>
+                                <li><a href="{% url 'ls_manifest_create_form' %}">Add Lab Sample Manifest</a></li>
+                            </ul>
                         </li>
-
-                        
 
                     </ul>
                 </div>

@@ -55,6 +55,9 @@ class Book(models.Model):
 # Note about conversion of Biotrack models:
 # Because Django reserves "id" when I encounter "id" in Biotrack
 # I add a "biotrack_" prefix.   id   >>>   biotrack_id
+    
+# TODO: Show DELETED status in model names
+# TODO: Add session_time to (almost) all model names
 
 class Strain(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -521,6 +524,7 @@ class TT_Storage_Batch(models.Model):
     # If TT_Storage_Batch.wet_dry = "dry":
     #     TT_Plant_Batch_Harvest.remaining_dry_weight = TT_Plant_Batch_Harvest.remaining_dry_weight - TT_Storage_Batch.weight
     weight = models.FloatField(null=True, blank=False)
+    remaining_weight = models.FloatField(null=True, blank=True)
     # Status examples: in storage, sent to processor, converted to product batch, destroyed
 
     STATUS = (
@@ -551,7 +555,7 @@ class TT_Storage_Batch(models.Model):
         return reverse('tt_storage_batch_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.harvest_batch.plant_batch.strain} - {self.wet_dry} {self.produce_category} - Storage Batch {str(self.package_number)}'
+        return f'{self.harvest_batch.plant_batch.strain} - {self.wet_dry} {self.produce_category} - Storage Batch {str(self.package_number)} {str(self.session_time)}'
 
 
 class TT_Product_Batch(models.Model):
@@ -675,7 +679,6 @@ class TT_Inventory_Product(models.Model):
     med_usable_weight = models.FloatField(null=True, blank=True)
     medicated = models.BooleanField(default=False)
     seized = models.BooleanField(default=False)
-    session_time = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=250, null=True, blank=True)
     transaction_id = models.IntegerField(null=True, blank=True)
     session_time = models.DateField(auto_now_add=True)
@@ -713,7 +716,7 @@ class Invoice_Model(models.Model):
         return reverse('invoice_model_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return self.invoice_name
+        return f'{self.invoice_name}  {str(self.session_time)}'
 
 # This name comes from Bio Track API
 # I would call this model Invoice_Item
@@ -739,7 +742,7 @@ class Invoice_Inventory(models.Model):
         return reverse('invoice_inventory_detail', args=[str(self.uid)])
       
     def __str__(self):
-        return f'{self.inventory_product.product_batch.product_name} - Stop item {str(self.session_time)}'
+        return f'{self.inventory_product.product_batch.product_name} - Inventory Item {str(self.session_time)}'
 
 
 class TT_Lab_Sample(models.Model):
@@ -766,11 +769,11 @@ class TT_Lab_Sample(models.Model):
     medical_grade = models.BooleanField(default=False)
     parent_id = models.CharField(max_length=250, null=True, blank=True)
     result = models.CharField(max_length=250, null=True, blank=True)
-    results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE)
+    results = models.ForeignKey(Lab_Result, on_delete=models.CASCADE, null=True, blank=True)
     rn_d = models.BooleanField(default=False)
     sample_use = models.CharField(max_length=250, null=True, blank=True)
     session_time = models.DateField(auto_now_add=True)
-    test_results = models.ForeignKey(Lab_Sample_Result, on_delete=models.CASCADE)
+    test_results = models.ForeignKey(Lab_Sample_Result, null=True, blank=True, on_delete=models.CASCADE)
     transaction_id = models.IntegerField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
@@ -779,7 +782,7 @@ class TT_Lab_Sample(models.Model):
         return reverse('tt_lab_sample_detail', args=[str(self.uid)])
 
     def __str__(self):
-        return f'{self.sample_name} - Sample of {self.product_batch.product_name}'
+        return f'{self.sample_name} - Sample of {self.product_batch.product_name} {str(self.session_time)}'
 
 
 class Manifest_Driver(models.Model):
@@ -804,7 +807,7 @@ class Stop_Item(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    inventory_product = models.ForeignKey(TT_Inventory_Product, on_delete=models.CASCADE)
+    inventory_product = models.ForeignKey(TT_Inventory_Product, null=True, blank=True, on_delete=models.CASCADE)
     description = models.CharField(max_length=250, null=True, blank=True)
     biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
     inventory_id = models.CharField(max_length=250, null=True, blank=True)
@@ -823,7 +826,35 @@ class Stop_Item(models.Model):
         return reverse('stop_item_detail', args=[str(self.uid)])
     
     def __str__(self):
+               
         return f'Stop {self.stop_number}: {self.inventory_product.product_batch.product_name} item'
+
+
+class LS_Stop_Item(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+    lab_sample = models.ForeignKey(TT_Lab_Sample, null=True, blank=True, on_delete=models.CASCADE)
+    description = models.CharField(max_length=250, null=True, blank=True)
+    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
+    inventory_id = models.CharField(max_length=250, null=True, blank=True)
+    manifest_id = models.CharField(max_length=250, null=True, blank=True)
+    quantity = models.FloatField(null=True, blank=True)
+    quantity_received = models.FloatField(null=True, blank=False)
+    stop_number = models.IntegerField(null=True, blank=False)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    # TT_Product_Batch.total_weight = TT_Product_Batch.total_weight - Stop_Item.weight
+    weight = models.FloatField(null=True, blank=False)
+    session_time = models.DateField(auto_now_add=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('stop_item_detail', args=[str(self.uid)])
+    
+    def __str__(self):
+               
+        return f'Stop {self.stop_number}: {self.lab_sample.product_batch.product_name} sample'
 
 
 class Manifest_Stop(models.Model):
@@ -854,7 +885,36 @@ class Manifest_Stop(models.Model):
     def __str__(self):
         return self.stop_name
 
+# Lab Sample (LS) Manifest
+class LS_Manifest_Stop(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+    stop_name = models.CharField(max_length=250, null=True, blank=False)
+    approximate_arrival = models.DateField(null=True, blank=True)
+    approximate_departure = models.DateField(null=True, blank=True)
+    approximate_route = models.CharField(max_length=250, null=True, blank=True)
+    driver_arrived = models.BooleanField(default=False)
+    driver_arrived_time = models.TimeField(null=True, blank=True)
+    biotrack_id = models.IntegerField(null=True, blank=True) #BiotrackAPI key = 'id'
+    invoice = models.ForeignKey(Invoice_Model, on_delete=models.CASCADE, blank=True, null=True)
+    biotrack_invoice_id = models.CharField(max_length=250, null=True, blank=True) #Original BiotrackAPI key = 'invoice_id'
+    items = models.ForeignKey(LS_Stop_Item, on_delete=models.CASCADE)
+    items_count = models.IntegerField(null=True, blank=True)
+    location_license = models.CharField(max_length=250, null=True, blank=True)
+    manifest_id = models.CharField(max_length=250, null=True, blank=True)
+    stop_number = models.IntegerField(null=True, blank=True)
+    session_time = models.DateField(auto_now_add=True)
+    notes = models.TextField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_stop_detail', args=[str(self.uid)])
+    
+    def __str__(self):
+        return self.stop_name
+
+# TODO: Add license number, car_make, car_model
 class Manifest_Vehicle(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -889,6 +949,8 @@ class Manifest_ThirdPartyTransporter(models.Model):
     def __str__(self):
         return self.name
 
+# TODO: I need to create a Lab_Sample_Manifest that takes Lab_Sample_Stop_Item and Lab_Sample_Stop. It will involve a lot of copy and pasting.
+# Changing the original Manifest model will break the OCM report that I made. 
 
 class Manifest(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -946,7 +1008,66 @@ class Manifest(models.Model):
     
     def __str__(self):
         return self.manifest_name
+
+# Lab Sample (LS)
+class LS_Manifest(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+    manifest_name = models.CharField(max_length=250, null=True, blank=False)
     
+
+    DESTINATIONCAT = (
+        ('cultivator','cultivator'),
+        ('processor','processor'),
+        ('lab','lab'),
+        ('dispensary','dispensary'),
+        ('other','other'),
+    )
+
+    destination_category = models.CharField(
+        max_length=25,
+        choices=DESTINATIONCAT,
+        blank=True,
+        default='dispensary',
+    )
+
+    stops = models.ForeignKey(LS_Manifest_Stop, on_delete=models.CASCADE)
+    city = models.CharField(max_length=250, null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    completion_date = models.DateField(null=True, blank=True)
+    created_on = models.DateField(null=True, blank=True)
+    driver_arrived = models.BooleanField(default=False)
+    drivers = models.ForeignKey(Manifest_Driver, on_delete=models.CASCADE)
+    in_transit = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
+    is_parked = models.BooleanField(default=False)
+    license_number = models.CharField(max_length=250, null=True, blank=True)
+    manifest_id = models.CharField(max_length=250, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    phone = models.CharField(max_length=25, null=True, blank=True)
+    received = models.BooleanField(default=False)
+    state = models.CharField(max_length=250, null=True, blank=True)
+    stop_count = models.IntegerField(null=True, blank=True)
+    street = models.CharField(max_length=250, null=True, blank=True)
+    third_party_transporter = models.ForeignKey(Manifest_ThirdPartyTransporter, on_delete=models.CASCADE)
+    total_item_count = models.IntegerField(null=True, blank=True)
+    transaction_id = models.IntegerField(null=True, blank=True)
+    type = models.CharField(max_length=250, null=True, blank=True)
+    updated_on = models.CharField(max_length=250, null=True, blank=True)
+    vehicle = models.ForeignKey(Manifest_Vehicle, on_delete=models.CASCADE)
+    zip = models.CharField(max_length=250, null=True, blank=True)
+    session_time = models.DateField(auto_now_add=True)
+    notes = models.TextField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular instance."""
+        return reverse('manifest_detail', args=[str(self.uid)])
+    
+    def __str__(self):
+        return self.manifest_name
+    
+
 
     # Delete Tracking Models
     # ======================

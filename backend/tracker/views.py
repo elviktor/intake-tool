@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from . import forms
 from django.forms import ValidationError
-from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info,Manifest_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete
+from .models import Book, Strain, TT_Inventory, TT_Inventory_Product, TT_Location, TT_Plant_Batch, TT_Plant_Batch_Harvest, TT_Storage_Batch,TT_Product_Batch, TT_Sublot, TT_Lab_Sample, Plant, Weight, Derivative, Plant_Harvest, Lab_Result, Lab_Sample_Result, Lab_Sample, Inventory, Inventory_Room, Inventory_Sublot, Inventory_Move, Plant_Cure, Invoice_Inventory, Invoice_Model, Manifest_Driver, Stop_Item, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Grow_Room, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info,Manifest_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete, LS_Stop_Item, LS_Manifest_Stop, LS_Manifest
 
 # Contents
 # ========
@@ -241,7 +241,7 @@ def harvest_to_storage(request):
             formset_c = forms.TTHarvestToStorageFormsetC(instance=sublot, form_kwargs={'user': request.user})
 
             # Create a new Product instance and associate it with the inventory
-            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location_date=location_date,location=location, sublot=sublot, weight=weight, package_number=package_number, produce_category=produce_category, wet_dry=wet_dry)
+            storage_batch = TT_Storage_Batch.objects.create(user=request.user, harvest_batch=harvest_batch,location_date=location_date,location=location, sublot=sublot, weight=weight,remaining_weight=weight, package_number=package_number, produce_category=produce_category, wet_dry=wet_dry)
 
             if wet_dry == "wet":
                 # Update the harvest batch weight
@@ -334,7 +334,7 @@ def storage_to_product(request):
             total_pounds = total_weight * 0.00220462 # Convert g > lb
 
             if storage_batches.weight != None:
-                storage_batches.weight -= total_pounds
+                storage_batches.remaining_weight -= total_pounds
                 storage_batches.save()
                 form.save()
             else:
@@ -519,6 +519,53 @@ def inventory_to_stop_item(request):
         formset_a = forms.TTInventoryToStopItemFormsetA(instance=inventory_product, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/tt_inventory_to_stop_item_form.html', {'form': form})
+
+
+@login_required
+def lab_sample_to_ls_stop_item(request):
+# This can be used as ls_stop_item_create_form
+    
+    if request.method == 'POST':
+
+        lab_sample = None
+        user = request.user
+
+        form = forms.TTLabSampleToLSStopItemForm(request.POST,user=user)
+        formset_a = forms.TTLabSampleToLSStopItemFormsetA(instance=lab_sample, form_kwargs={'user': request.user})
+
+        if form.is_valid():
+            weight = form.cleaned_data['weight'] 
+            quantity_received = form.cleaned_data['quantity_received']
+            lab_sample = form.cleaned_data['lab_sample']
+            stop_number = form.cleaned_data['stop_number']
+            
+            form = forms.TTLabSampleToLSStopItemForm(request.POST, instance=user, user=user)
+            formset_a = forms.TTLabSampleToLSStopItemFormsetA(instance=lab_sample, form_kwargs={'user': request.user})
+
+
+            # Create a new Stop Item instance and associate it with the inventory
+            stop_item = LS_Stop_Item.objects.create(user=request.user,lab_sample=lab_sample, weight=weight, quantity=quantity_received, quantity_received=quantity_received, stop_number=stop_number)
+
+            # Update the product batch amount (weight) and quantity
+            if lab_sample.amount != None:
+                lab_sample.amount -= weight
+                lab_sample.quantity -= quantity_received
+                lab_sample.save()
+                form.save()
+            else:
+                raise ValidationError("Check product batch quantity")
+            
+            return redirect('home')
+    
+    else:
+        lab_sample = None
+        user = request.user
+        
+        form = forms.TTLabSampleToLSStopItemForm(user=user)
+        formset_a = forms.TTLabSampleToLSStopItemFormsetA(instance=lab_sample, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/tt_lab_sample_to_ls_stop_item_form.html', {'form': form})
+
 
 @login_required
 def inventory_to_invoice_item(request):
@@ -1101,9 +1148,66 @@ def manifest_stop_create_form(request):
 
         form = forms.ManifestStopCreateForm(user=user)
         formset_a = forms.ManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
-        formset_b = forms.ManifestStopCreateFormsetB(instance=items, form_kwargs={'user': request.user})
+        formset_b = forms.ManifestStopCreateFormsetB(instance=invoice, form_kwargs={'user': request.user})
 
     return render(request, 'tracker/manifest_stop_create_form.html', {'form': form})
+
+
+@login_required
+def ls_manifest_stop_create_form(request):
+    
+    if request.method == 'POST':
+
+        items = None
+        invoice = None
+        user = request.user
+
+        form = forms.LSManifestStopCreateForm(request.POST,user=user)
+        formset_a = forms.LSManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+        formset_b = forms.LSManifestStopCreateFormsetB(instance=invoice, form_kwargs={'user': request.user})
+        
+        if form.is_valid():
+            
+            # Gather cleaned input data from fields
+            # Example: quantity = form.cleaned_data['amount']
+            stop_name = form.cleaned_data['stop_name']
+            stop_number = form.cleaned_data['stop_number']
+            approximate_arrival = form.cleaned_data['approximate_arrival']
+            approximate_departure = form.cleaned_data['approximate_departure']
+            approximate_route = form.cleaned_data['approximate_route']
+            driver_arrived = form.cleaned_data['driver_arrived']
+            driver_arrived_time = form.cleaned_data['driver_arrived_time']
+            invoice = form.cleaned_data['invoice']
+            items = form.cleaned_data['items']
+            #items_count = form.cleaned_data['items_count']
+            location_license = form.cleaned_data['location_license']
+            notes = form.cleaned_data['notes']
+            
+            form = forms.LSManifestStopCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.LSManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+            formset_b = forms.LSManifestStopCreateFormsetB(instance=invoice, form_kwargs={'user': request.user})
+
+            # Create a new Model instance and associate it with the batch
+            manifest_stop = LS_Manifest_Stop.objects.create(user=request.user,stop_name=stop_name, stop_number=stop_number, approximate_arrival=approximate_arrival,approximate_departure=approximate_departure,approximate_route=approximate_route, driver_arrived=driver_arrived,driver_arrived_time=driver_arrived_time,invoice=invoice,items=items,items_count=items.quantity,location_license=location_license,notes=notes)
+
+            # Manipulate model (optional)
+            
+            # Save
+            form.save()
+            
+            return redirect('home')
+    
+    else:
+
+        items = None
+        invoice = None
+        user = request.user
+
+        form = forms.LSManifestStopCreateForm(user=user)
+        formset_a = forms.LSManifestStopCreateFormsetA(instance=items, form_kwargs={'user': request.user})
+        formset_b = forms.LSManifestStopCreateFormsetB(instance=invoice, form_kwargs={'user': request.user})
+
+    return render(request, 'tracker/ls_manifest_stop_create_form.html', {'form': form})
 
 
 @login_required
@@ -1258,9 +1362,90 @@ def manifest_create_form(request):
 
     return render(request, 'tracker/manifest_create_form.html', {'form': form})
 
+# Lab Sample (LS) Manifest
+@login_required
+def ls_manifest_create_form(request):
+
+    if request.method == 'POST':
+
+        stops = None
+        drivers = None
+        third_party_transporter = None
+        vehicle = None
+        user = request.user
+
+        form = forms.LSManifestCreateForm(request.POST,user=user)
+        formset_a = forms.LSManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+        formset_b = forms.LSManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+        formset_c = forms.LSManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+        formset_d = forms.LSManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+
+
+        if form.is_valid():
+            manifest_name = form.cleaned_data['manifest_name']
+            # Destination info
+            destination_category = form.cleaned_data['destination_category']
+            name = form.cleaned_data['name']
+            phone = form.cleaned_data['phone']
+            street = form.cleaned_data['street']
+            city = form.cleaned_data['city']
+            state = form.cleaned_data['state']
+            zip = form.cleaned_data['zip']
+            # Stop and item info
+            stops = form.cleaned_data['stops']
+            stop_count = form.cleaned_data['stop_count']
+            total_item_count = form.cleaned_data['total_item_count']
+            # Driver info
+            drivers = form.cleaned_data['drivers']
+            vehicle = form.cleaned_data['vehicle']
+            third_party_transporter = form.cleaned_data['third_party_transporter']
+            # Status info
+            completed = form.cleaned_data['completed']
+            created_on = form.cleaned_data['created_on']
+            driver_arrived = form.cleaned_data['driver_arrived']
+            in_transit = form.cleaned_data['in_transit']
+            is_accepted = form.cleaned_data['is_accepted']
+            is_parked = form.cleaned_data['is_parked']
+            received = form.cleaned_data['received']
+            type = form.cleaned_data['type']
+            notes = form.cleaned_data['notes']
+
+
+            form = forms.LSManifestCreateForm(request.POST, instance=user, user=user)
+            formset_a = forms.LSManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+            formset_b = forms.LSManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+            formset_c = forms.LSManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+            formset_d = forms.LSManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+
+            # Create a new instance
+            manifest = LS_Manifest.objects.create( user=request.user, manifest_name=manifest_name,destination_category=destination_category,name=name,phone=phone,street=street,city=city,state=state,zip=zip,stops=stops,stop_count=stop_count,total_item_count=total_item_count,drivers=drivers,vehicle=vehicle,third_party_transporter=third_party_transporter,completed=completed,created_on=created_on,driver_arrived=driver_arrived,in_transit=in_transit,is_parked=is_parked, is_accepted=is_accepted,received=received,type=type,notes=notes)
+            
+            form.save()
+
+            return redirect('home')
+    else:
+        stops = None
+        drivers = None
+        third_party_transporter = None
+        vehicle = None
+        user = request.user
+
+        form = forms.LSManifestCreateForm(user=user)
+        formset_a = forms.LSManifestCreateFormsetA(instance=stops, form_kwargs={'user': request.user})
+        formset_b = forms.LSManifestCreateFormsetB(instance=drivers, form_kwargs={'user': request.user})
+        formset_c = forms.LSManifestCreateFormsetC(instance=third_party_transporter, form_kwargs={'user': request.user})
+        formset_d = forms.LSManifestCreateFormsetD(instance=vehicle, form_kwargs={'user': request.user})
+        
+
+    return render(request, 'tracker/ls_manifest_create_form.html', {'form': form})
+
 
 # Toggle Delete Views
 # ===================
+
+# TODO: Deleted models need to "give back" any weight that they have accumulated in some cases.
+# Example: A deleted Product Batch submitted with the wrong weight needs to return the value that it was given to the proper Storage Batch before getting deleted (marked Delete == TRUE)
+
 @login_required
 def tt_location_delete_form(request):
     

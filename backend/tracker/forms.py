@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import ModelForm
 from django.forms import inlineformset_factory
-from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info, Manifest_Driver, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Delete
+from .models import Strain, TT_Location, TT_Sublot, TT_Plant_Batch, TT_Storage_Batch, TT_Product_Batch, TT_Lab_Sample, TT_Inventory, TT_Inventory_Product, Stop_Item, Invoice_Model, Invoice_Inventory, TT_Plant_Batch_Harvest, Lab_Sample_Result, Lab_Result, TT_Location_Delete,TT_Sublot_Delete,Strain_Delete,TT_Plant_Batch_Delete,TT_Plant_Batch_Harvest_Delete,TT_Storage_Batch_Delete,TT_Product_Batch_Delete,Lab_Result_Delete,Lab_Sample_Result_Delete,TT_Lab_Sample_Delete,TT_Inventory_Delete,TT_Inventory_Product_Delete,Invoice_Model_Delete,Invoice_Inventory_Delete, TT_User_Info, Manifest_Driver, Manifest_Stop, Manifest_Vehicle, Manifest_ThirdPartyTransporter, Manifest, Manifest_Stop_Delete,Manifest_Driver_Delete,Manifest_Vehicle_Delete,Manifest_ThirdPartyTransporter_Delete,Manifest_Delete, LS_Stop_Item, LS_Manifest_Stop, LS_Manifest
 
 # Date and Time Widgets
 class DateInput(forms.DateInput):
@@ -143,6 +143,8 @@ TTProductToLabSampleFormsetD = inlineformset_factory(
 TTProductToLabSampleFormsetE = inlineformset_factory(
     Lab_Sample_Result, TT_Lab_Sample, form=TTProductToLabSampleForm, fields=('test_results',), can_delete=True, extra=0)
 
+#TODO: Need to create Lab Sample to Stop Item form. Because manifests are needed for testing sample transport.
+
    
 # I need to split Inventory Creation and then Adding items/products to Inventory (foreign key)
 class TTProductToInventoryForm(ModelForm):
@@ -188,6 +190,7 @@ TTProductToInventoryFormsetB = inlineformset_factory(
     TT_Product_Batch, TT_Inventory_Product, form=TTProductToInventoryForm, fields=('product_batch',), can_delete=True, extra=0)
 
 # Used instead of a StopItemCreateForm
+# This form can also transfer from Lab Samples
 class TTInventoryToStopItemForm(ModelForm):
    class Meta:
       model = Stop_Item
@@ -225,6 +228,46 @@ class TTInventoryToStopItemForm(ModelForm):
    
 TTInventoryToStopItemFormsetA = inlineformset_factory(
     TT_Inventory_Product, Stop_Item, form=TTProductToInventoryForm, fields=('inventory_product',), can_delete=True, extra=0)
+
+
+class TTLabSampleToLSStopItemForm(ModelForm):
+   class Meta:
+      model = LS_Stop_Item
+      fields = ['stop_number','lab_sample','description','quantity_received','weight']
+   
+   def __init__(self, *args, user, **kwargs):
+       self.user = user
+       super().__init__(*args, **kwargs)
+
+       self.fields['weight'].widget.attrs.update({'step': '0.01'})
+
+       self.fields['lab_sample'].queryset = TT_Lab_Sample.objects.filter(user=self.user)
+   
+   def clean_sample_weight(self):
+      weight = self.cleaned_data['weight']
+      total_weight = self.instance.TT_Lab_Sample.amount
+
+        # Ensure that product weight is not greater than total weight
+      if weight > total_weight:
+         raise forms.ValidationError("Stop Item weight cannot be greater than total lab sample weight.")
+
+      return weight
+
+   def clean_sample_quantity(self):
+      quantity = self.cleaned_data['quantity']
+      total_quantity = self.instance.TT_Lab_Sample.quantity
+
+      # Ensure that stop item quantity is not greater than total batch quantity
+      if quantity > total_quantity:
+          raise forms.ValidationError("Stop Item quantity cannot be greater than total lab sample quantity.")
+
+      return quantity
+   
+   lab_sample = forms.ModelChoiceField(queryset=TT_Lab_Sample.objects.all(), empty_label="Select a lab sample...")
+   
+TTLabSampleToLSStopItemFormsetA = inlineformset_factory(
+    TT_Lab_Sample, LS_Stop_Item, form=TTLabSampleToLSStopItemForm, fields=('lab_sample',), can_delete=True, extra=0)
+
 
 
 class TTInventoryToInvoiceItemForm(ModelForm):
@@ -485,6 +528,32 @@ ManifestStopCreateFormsetA = inlineformset_factory(
 ManifestStopCreateFormsetB = inlineformset_factory(
     Invoice_Model, Manifest_Stop, form=ManifestStopCreateForm, fields=('invoice',), can_delete=True, extra=0)
 
+# Lab Sample (LS) Manifest Stop
+class LSManifestStopCreateForm(ModelForm):
+   
+   class Meta:
+      model = LS_Manifest_Stop
+      fields = ['stop_name','stop_number','items','approximate_departure','approximate_arrival','approximate_route','driver_arrived','driver_arrived_time','invoice','biotrack_invoice_id','location_license','manifest_id','notes']
+      widgets = {
+            'approximate_arrival': DateInput(),
+            'approximate_departure': DateInput(),
+            'driver_arrived_time': TimeInput()
+        }
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['items'].queryset = LS_Stop_Item.objects.filter(user=self.user)
+        self.fields['invoice'].queryset = Invoice_Model.objects.filter(user=self.user)
+
+   items = forms.ModelChoiceField(queryset=LS_Stop_Item.objects.all(), empty_label="Select a stop item...")
+
+LSManifestStopCreateFormsetA = inlineformset_factory(
+    LS_Stop_Item, LS_Manifest_Stop, form=LSManifestStopCreateForm, fields=('items',), can_delete=True, extra=0)
+LSManifestStopCreateFormsetB = inlineformset_factory(
+    Invoice_Model, LS_Manifest_Stop, form=LSManifestStopCreateForm, fields=('invoice',), can_delete=True, extra=0)
+
+
 
 class ManifestVehicleCreateForm(ModelForm):
    
@@ -540,6 +609,38 @@ ManifestCreateFormsetC = inlineformset_factory(
 ManifestCreateFormsetD = inlineformset_factory(
     Manifest_Vehicle, Manifest, form=ManifestCreateForm, fields=('vehicle',), can_delete=True, extra=0)
 
+# Lab Sample (LS) Manifest
+class LSManifestCreateForm(ModelForm):
+   
+   class Meta:
+      model = LS_Manifest
+      fields = ['manifest_name','destination_category','stops','stop_count','total_item_count','type','name','phone','street','city','state','zip','drivers','vehicle','third_party_transporter','created_on','completed','completion_date','driver_arrived','in_transit','is_accepted','is_parked','received','updated_on','notes']
+      widgets = {
+            'created_on': DateInput(),
+        }
+   
+   def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields['stops'].queryset = LS_Manifest_Stop.objects.filter(user=self.user)
+        self.fields['drivers'].queryset = Manifest_Driver.objects.filter(user=self.user)
+        self.fields['third_party_transporter'].queryset = Manifest_ThirdPartyTransporter.objects.filter(user=self.user)
+        self.fields['vehicle'].queryset = Manifest_Vehicle.objects.filter(user=self.user)
+
+   stops = forms.ModelChoiceField(queryset=LS_Manifest_Stop.objects.all(), empty_label="Select a stop...")
+   drivers = forms.ModelChoiceField(queryset=Manifest_Driver.objects.all(), empty_label="Select a driver...")
+   third_party_transporter = forms.ModelChoiceField(queryset=Manifest_ThirdPartyTransporter.objects.all(), empty_label="Select a third party transporter...") 
+   vehicle = forms.ModelChoiceField(queryset=Manifest_Vehicle.objects.all(), empty_label="Select a vehicle...") 
+   
+
+LSManifestCreateFormsetA = inlineformset_factory(
+    LS_Manifest_Stop, LS_Manifest, form=LSManifestCreateForm, fields=('stops',), can_delete=True, extra=0)
+LSManifestCreateFormsetB = inlineformset_factory(
+    Manifest_Driver, LS_Manifest, form=LSManifestCreateForm, fields=('drivers',), can_delete=True, extra=0)
+LSManifestCreateFormsetC = inlineformset_factory(
+    Manifest_ThirdPartyTransporter, LS_Manifest, form=LSManifestCreateForm, fields=('third_party_transporter',), can_delete=True, extra=0)
+LSManifestCreateFormsetD = inlineformset_factory(
+    Manifest_Vehicle, LS_Manifest, form=LSManifestCreateForm, fields=('vehicle',), can_delete=True, extra=0)
 
 
 # Delete Forms
